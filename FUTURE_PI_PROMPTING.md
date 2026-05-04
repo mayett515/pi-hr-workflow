@@ -54,6 +54,7 @@ Common styles:
 - `test-only guard`: production code is out of scope; the worker adds source-level or runtime regression guards for a known failure mode.
 - `architecture/doc guard`: documentation and architecture guard tests only; useful after implementation slices to prevent backsliding.
 - `loose exploratory`: read-only or planning work where the model is allowed to discover options. Do not use this for persistence or broad code edits.
+- `read-only audit`: no writes allowed; worker inventories source files, classifies findings, and recommends bounded follow-up tickets.
 
 Record these fields in `model_hr_db.json` after the run:
 
@@ -80,6 +81,7 @@ Use the HR record to adapt prompts:
 - Model reports poorly: require final report sections and rg summaries.
 - Model is good at guard tests: assign post-implementation architecture guard slices.
 - Model is weak near persistence: keep it away from migrations/import/export, or make it draft-only.
+- Model is doing a label audit: explicitly include placeholders, conditional labels, empty states, subtitles, errors, and button text in the search target list.
 
 ## Add These for Exported Type Changes
 
@@ -107,6 +109,24 @@ If you do an optional improvement, report it separately from required changes an
 ```
 
 Why: optional work can hide behavior changes. Keep it visible.
+
+## Add These When Handoff Docs Are In Scope
+
+Use this when the worker is allowed to edit `implementation_handoff.md`, status docs, or HR docs:
+
+```markdown
+<handoff_update_policy>
+If you update handoff/status documentation, update every affected durable section:
+- implemented-so-far / changed-files bullets
+- latest verification block and test counts
+- next-step queue, marking completed items done and adding remaining follow-ups
+
+Do not leave the latest verification block pointing at an older slice.
+In the final report, state exactly which handoff/status sections you updated.
+</handoff_update_policy>
+```
+
+Why: strong workers have repeatedly updated implementation bullets but left stale verification/next-step text behind.
 
 ## Add These for Terminology Refactors
 
@@ -210,3 +230,15 @@ Record prompt improvements in the evaluation. Future prompts should reuse those 
 - Ask the worker to separate required changes from optional improvements.
 - Require tests for preferred field, legacy alias, and both-present behavior when aliases exist.
 - Keep persistence and backup/import tasks out of cheap-worker hands unless the prompt demands raw-shape tests and validate-before-wipe behavior.
+- For read-only label audits, require the worker to classify placeholders, conditional labels, empty states, subtitles, errors, and button text; Codex should verify a sample before turning findings into tickets.
+- When docs are in scope, explicitly require updating latest verification text and next-step queues, not only implementation bullets.
+- For profile-label wiring, require old-string `rg` checks plus profile-access `rg` checks, and ask the worker to explain every remaining hardcoded hit.
+- For profile-label wiring, state whether labels should go in `DomainLabels` or a feature sub-profile; do not let many feature-specific labels silently accumulate in one flat label bag.
+- For UI label cleanup, explicitly state whether dynamic count/pluralization strings and fallback placeholders are in scope.
+- Use exact old UI strings in required `rg` checks, not approximate paraphrases.
+- For dynamic/pluralized UI label changes, require rendered before/after examples for singular and plural cases; profile value tests alone can miss capitalization or grammar regressions.
+- Do not reuse generic singular/plural profile labels for inline text unless their capitalization exactly matches the old rendered wording.
+- When a field is described as optional/null, require separate tests for both omitted and explicit `null` values; nullable-only tests do not prove optional semantics.
+- For validation helper slices, state whether runtime validation of closed union fields is required or whether TypeScript-only enforcement is acceptable.
+- For test-only guard tasks, require the final report to separate the actual number of new `it(...)` test blocks from the number of logical assertions covered inside those tests.
+- Ask guard-test workers to describe residual risk accurately: source-level guards prevent specific regressions, but they do not prove future persistence/UI behavior is complete or risk-free.

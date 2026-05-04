@@ -213,6 +213,10 @@ Use these especially for:
 - UI behavior changes
 - persistence-adjacent code
 - cross-feature call-site repairs
+- handoff/status documentation updates
+- profile-label wiring slices
+
+For handoff/status documentation updates, explicitly require workers to update latest verification blocks and next-step queues. Strong workers have repeatedly updated implementation bullets while leaving stale verification text for Codex to fix.
 
 ## Current Model Notes
 
@@ -230,9 +234,11 @@ Mimo 2.5 Pro:
 
 Qwen 3.6 Plus:
 - Result on retrieval `typeNodeId` / `typeNodeIds` slice: strong.
+- Result on tiny `GraphLegend` title profile-label slice: strong, 9/10; needed only one redundant profile accessor cleanup.
+- Result on ontology correction evidence groundwork slice: strong, 8/10; stayed domain-only and scoped, but Codex fixed `reason` from required nullable to optional nullable and added the omitted-reason test.
 - Preserved `conceptTypes` as a compatibility alias while adding preferred `typeNodeIds`.
 - Followed TypeScript payload rename through codecs, row mappers, formatters, tests, and necessary downstream consumers.
-- Good candidate for medium compatibility-preserving API/payload rename slices.
+- Good candidate for medium compatibility-preserving API/payload rename slices, tiny/small strict profile-label wiring tickets, and small TypeScript domain-shape/validation-helper groundwork.
 
 MiniMax M 2.7:
 - Result on `TypeNodeChip` UI primitive rename slice: medium.
@@ -242,8 +248,9 @@ MiniMax M 2.7:
 
 DeepSeek V4 Pro under Pi:
 - Result on TypeNodeChip compatibility guard tests: strong.
+- Result on ontology correction evidence architecture guards: strong, 8/10.
 - Stayed test-only, scoped, and targeted the exact previous shim failure mode.
-- No reviewer code changes needed.
+- Continues to be reliable for one-file source guard work, though Codex had to correct final-report test counts and overconfident residual-risk wording.
 - Much better behavior under Pi with tight prompts than the earlier OpenCode CLI run.
 - Good candidate for focused regression guard tests before giving it implementation work.
 
@@ -255,14 +262,26 @@ GLM 5.1:
 
 Kimi K2.6:
 - Result on `ConceptListFilters.typeNodeIds` compatibility alias slice: strong.
+- Result on review UI `ReviewProfile` label wiring slice: strong.
+- Result on graph UI `GraphProfile` label wiring slice: strong.
+- Result on small Learning UI `DomainLabels` wiring slice: strong, 9/10.
+- Result on Learning UI helper-label/nested flashback slice: strong, 9/10.
+- Result on graph helper-label nested `GraphProfile` slice: strong, 8/10; needed one handoff count correction.
+- Result on dynamic/fallback label wiring slice: medium, 7/10; required a reviewer production fix because count labels reused capitalized generic labels where the old UI rendered lowercase words.
 - Followed a strict bounded ticket prompt with explicit files, compatibility aliases, rg summary, TypeScript, targeted tests, and full suite.
-- No reviewer code changes were needed; Codex only updated documentation/HR records.
-- Good candidate for future compatibility-alias refactors and small TypeScript hook/API cleanup slices when given a professional bounded ticket.
+- Usually keeps scope well, but dynamic/pluralized UI text needs explicit rendered-output checks for singular and plural cases.
+- Good candidate for future compatibility-alias refactors, profile-label wiring, and small/medium TypeScript UI/API cleanup slices when given a professional bounded ticket.
+
+DeepSeek V4 Flash:
+- Result on read-only hardcoded domain-label audit: medium.
+- Correctly identified review UI as the largest remaining unprofiled label seam and avoided broad rename recommendations.
+- Missed a few labels (`ReflectionInput` placeholder and `Close`) and had one final-report field error, so use it as a scout with Codex verification.
+- Good candidate for fast read-only audits before assigning implementation to a stricter bounded-ticket worker.
 
 ## Current Refactor Next-Step Queue
 
-1. UI action/domain label sweep: only move labels that are truly domain vocabulary, not structural chrome.
-2. Read-only hardcoded wording audit: inventory remaining `learning`/`concept` product language and separate domain labels from structural feature names.
+1. Optional tiny polish: decide whether `GraphLegend.tsx` "Legend" title should be profile-driven or treated as structural UI chrome.
+2. Next major product slice remains ontology correction/checker, after label polish is committed.
 3. Later only: second-profile support and cleanup migrations after compatibility is proven.
 
 ## Rule of Thumb

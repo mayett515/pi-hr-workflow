@@ -25,6 +25,15 @@ Use SQLite later only if the record grows into hundreds or thousands of evaluati
 The current JSON shape is also meant to be app-friendly: evaluations can become cards, and tags can become clickable relationship nodes. See `APP_INTEGRATION_NOTES.md`.
 
 Prompt improvements that apply across models should be promoted into `FUTURE_PI_PROMPTING.md`, not only left inside one model evaluation.
+Recent promoted prompt improvements:
+- when handoff/status docs are in scope, require latest verification and next-step queue updates
+- for profile-label wiring, require both old-string `rg` checks and profile-access `rg` checks
+- for profile-label wiring, specify whether labels belong in `DomainLabels` or a feature sub-profile to avoid label sprawl
+- for UI label cleanup, specify whether dynamic count/pluralization strings and fallback placeholders are in scope
+- required `rg` checks should use exact old UI strings, not approximate paraphrases
+- for dynamic/pluralized UI label changes, require rendered examples for singular and plural cases
+- do not reuse generic singular/plural profile labels for inline text unless their capitalization exactly matches the old rendered wording
+- for read-only label audits, include placeholders, conditional labels, empty states, subtitles, errors, and button text in the search target list
 
 ## How To Add a New Evaluation
 
@@ -122,11 +131,12 @@ When asked which model to use for a task:
 
 - Kimi 2.5 is currently trusted for small bounded Pi refactor slices.
 - Mimo 2.5 Pro is currently trusted for medium bounded Pi refactor slices inside one feature.
-- Qwen 3.6 Plus is currently trusted for medium compatibility-preserving TypeScript API/payload rename slices.
+- Qwen 3.6 Plus is currently trusted for medium compatibility-preserving TypeScript API/payload rename slices, tiny/small strict profile-label wiring tickets, and small TypeScript domain-shape/validation-helper groundwork. Require separate tests for optional and nullable shape semantics.
 - MiniMax M 2.7 is usable for small UI rename slices, but needs reviewer attention around deprecated compatibility shims.
 - DeepSeek V4 Pro under Pi is currently trusted for focused test-only regression guard slices with precise failure modes.
+- DeepSeek V4 Flash is usable as a fast read-only scout for label/hardcoding audits, but needs Codex source verification before acting on findings.
 - GLM 5.1 is currently trusted for architecture guard and anti-regression documentation slices.
-- Kimi K2.6 is currently trusted for strict bounded ticket work on compatibility-alias and small TypeScript hook/API cleanup slices.
+- Kimi K2.6 is currently trusted for strict bounded ticket work on compatibility-alias, profile-label wiring, and small/medium TypeScript UI/API cleanup slices; require explicit handoff verification updates when docs are in scope.
 - No Pi model has earned trust for persistence, backup, import, restore, or migration tasks yet.
 - Persistence, backup, import, restore, and migration tasks should stay with the strongest reviewer unless the worker is only generating a draft.
 

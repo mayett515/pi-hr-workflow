@@ -1025,6 +1025,1411 @@
         "avoid-persistence-without-review",
         "needs-runtime-tests-for-behavior-heavy-hooks"
       ]
+    },
+    {
+      "id": "2026-05-04-deepseek-v4-flash-readonly-label-audit",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "DeepSeek V4 Flash",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Read-only hardcoded domain-label audit",
+      "slice": "Audit remaining hardcoded learning/concept/capture/review/graph wording and classify which labels should move into the active domain profile.",
+      "difficulty": "small-readonly-audit",
+      "promptStyle": "loose exploratory",
+      "taskType": "read-only-domain-label-audit",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/04_REFACTOR_WITHOUT_BREAKING_APP.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/humanreadable.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts"
+      ],
+      "allowedWriteScopeStyle": "read-only / no edits",
+      "promptStrictness": "medium",
+      "evaluationMeaning": "Tests whether DeepSeek V4 Flash can act as a fast scout for profile-label hotspots without editing code or overrecommending broad renames.",
+      "promptAdaptationNotes": [
+        "Good candidate for read-only audits when the prompt provides explicit classification buckets.",
+        "Require the model to include exact rg commands and line references; Codex should verify a sample because it missed a few labels.",
+        "Do not graduate directly to persistence or broad implementation work based on this result.",
+        "For the next Flash implementation trial, keep the write scope narrow and require direct rg proof after edits."
+      ],
+      "allowedWriteScope": [
+        "No files; read-only audit only"
+      ],
+      "rating": "medium",
+      "score": 7,
+      "outcome": "Accepted as a useful scout audit after reviewer verification; no CodeLens files were changed by the worker.",
+      "strengths": [
+        "Stayed read-only and produced a structured audit report.",
+        "Correctly identified that the review UI has no profile usage and several hardcoded labels.",
+        "Correctly separated many structural/compatibility names from user-facing labels that may move to profile-owned config.",
+        "Recommended a small next implementation slice rather than a broad learning-to-knowledge rename.",
+        "Provided a useful search summary and approximate hotspot counts."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens ontology-profile direction well enough to flag review UI as the next label seam.",
+        "Kept documented compatibility boundaries such as LearningConcept.conceptType, ConceptHint.proposedConceptType, DB columns, and legacy aliases out of the suggested rename set.",
+        "Identified graph screen and mode labels as remaining profile-label candidates without confusing them with graph visual encoding already profile-driven."
+      ],
+      "generalizedStackStrengths": [
+        "Useful for TypeScript/React Native source audits driven by rg searches.",
+        "Can classify UI label hardcoding across feature folders when given explicit buckets.",
+        "Good enough for generating follow-up implementation tickets from a medium-size codebase."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at read-only reconnaissance and hotspot discovery.",
+        "Good at conservative compatibility-boundary reasoning when the prompt names the boundaries.",
+        "Useful as a cheap scout before assigning implementation to a more proven bounded-ticket worker."
+      ],
+      "misses": [
+        "Missed ReflectionInput placeholder text and the ReviewThresholdScreen Close label in the review UI sweep.",
+        "The best-next-worker-slice section put a task name where the suggested model should have been.",
+        "Some line references were approximate after later verification.",
+        "No independent proof was provided that all listed rg searches were run exactly as requested."
+      ],
+      "reviewerFixes": [
+        "Codex verified the main claims with targeted rg searches against the actual source.",
+        "Codex found additional review labels missed by the audit: ReflectionInput placeholder and Close.",
+        "No CodeLens code changes were made during this review.",
+        "Codex updated the Pi HR database/docs and will use the audit to draft the next bounded implementation prompt."
+      ],
+      "verification": [
+        "rg review UI labels/profile access: confirmed hardcoded labels and no profile usage in src/features/learning/review/ui",
+        "rg graph UI labels: confirmed GraphScreen and GraphModeBar hardcoded labels",
+        "rg learning UI labels: confirmed ConceptListSection, LearningHubScreen review entry, and SessionFlashbackScreen labels",
+        "No TypeScript or Vitest run was needed because the worker was read-only and no CodeLens files changed"
+      ],
+      "recommendedUse": [
+        "Read-only audits",
+        "Fast hotspot discovery before implementation planning",
+        "Classification reports with explicit buckets",
+        "Cheap scout work where Codex will verify before acting"
+      ],
+      "avoidFor": [
+        "Persistence, migrations, backup/import/export, or restore work",
+        "Broad implementation chunks until it proves scoped edits",
+        "Tasks where missed labels or approximate line references would be costly",
+        "Final acceptance without Codex source verification"
+      ],
+      "promptImprovements": [
+        "For label audits, explicitly include placeholders, button labels, empty states, subtitles, errors, and conditional labels in the search target list.",
+        "Require the final report to name the actual suggested model, not only the task name.",
+        "Ask for an \"uncertain/missed-risk\" section when the model cannot prove exhaustive coverage.",
+        "Keep the read-only/no-edits boundary for first trials of fast budget models."
+      ],
+      "usefulTools": [
+        "rg",
+        "source file reads",
+        "manual Codex verification of sampled findings"
+      ],
+      "tags": [
+        "read-only-audit",
+        "domain-labels",
+        "review-ui",
+        "graph-ui",
+        "DeepSeek-V4-Flash",
+        "medium",
+        "loose-exploratory"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "domain-label-sweep",
+        "review-ui"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "feature-folders",
+        "rg-audit"
+      ],
+      "generalCodingTags": [
+        "read-only-audit",
+        "scope-control",
+        "compatibility-boundary",
+        "reporting",
+        "prompt-style-aware",
+        "hotspot-discovery"
+      ],
+      "riskTags": [
+        "needs-source-verification",
+        "missed-label-risk",
+        "avoid-persistence-without-review",
+        "avoid-broad-implementation-without-tight-prompt"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-review-profile-labels",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Review UI profile-label wiring slice",
+      "slice": "Move hardcoded review UI labels into ReviewProfile and wire review UI components to the active domain profile while preserving exact coding wording.",
+      "difficulty": "medium-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "six review UI components"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can execute a broader strict bounded UI/profile wiring slice across several components without touching review logic or compatibility boundaries.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 remains a strong choice for strict bounded implementation tickets with explicit file lists.",
+        "It handled a multi-component profile-label wiring slice cleanly when all labels and do-not-touch boundaries were enumerated.",
+        "Continue requiring rg checks for old hardcoded strings and profile access after label-wiring tasks.",
+        "For future profile label slices, include all strings from the scout audit plus any missed placeholders/button labels."
+      ],
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/review/ui/ReviewThresholdScreen.tsx",
+        "src/features/learning/review/ui/ReviewSessionScreen.tsx",
+        "src/features/learning/review/ui/ReviewResultScreen.tsx",
+        "src/features/learning/review/ui/SelfRatingPrompt.tsx",
+        "src/features/learning/review/ui/ShowSavedReveal.tsx",
+        "src/features/learning/review/ui/ReflectionInput.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and a small handoff verification-note update; no production code changes were needed after worker implementation.",
+      "strengths": [
+        "Stayed inside the allowed write scope.",
+        "Moved all requested review UI strings into ReviewProfile while preserving exact coding wording.",
+        "Used the existing DomainLabels.reviewModeTitle for the review screen title instead of duplicating it.",
+        "Kept review data, hooks, services, types, persistence, and compatibility boundaries untouched.",
+        "Added a codingProfile test asserting the review label values.",
+        "Ran TypeScript, targeted profile test, full suite, and rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens profile-label seam and kept coding profile first-class.",
+        "Correctly incorporated labels found by the DeepSeek V4 Flash scout audit, including the ReflectionInput placeholder and Close label that Codex added to the prompt.",
+        "Preserved LearningConcept.conceptType, ConceptHint.proposedConceptType, DB columns, and review domain logic boundaries."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript interface extension and React Native component wiring across multiple TSX files.",
+        "Used existing profile access and alias import patterns consistently.",
+        "Added Vitest coverage for profile configuration without overbuilding runtime tests."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong at strict bounded ticket execution.",
+        "Good at multi-file UI label wiring when scope and exact strings are explicit.",
+        "Good at preserving behavior while moving literals into configuration/profile objects.",
+        "Good final reporting with compatibility boundaries and rg summaries."
+      ],
+      "misses": [
+        "The handoff verification block still referenced the previous ConceptListFilters slice until Codex corrected it.",
+        "The new ReviewProfile now has many flat fields; acceptable for this slice, but future larger profile growth may need grouping if complexity increases."
+      ],
+      "reviewerFixes": [
+        "Verified the actual diff and scope.",
+        "Ran TypeScript, targeted codingProfile test, full Vitest suite, and rg checks.",
+        "Updated implementation_handoff.md latest verification and next-step queue to reflect the review label slice.",
+        "No production code changes were required after Kimi K2.6 implementation."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 11/11 passed",
+        "npm test -- --run: 334/334 passed across 49 files",
+        "rg profile access in src/features/learning/review/ui: hits across all 6 review UI files",
+        "rg old targeted review strings in src/features/learning/review/ui: zero hits"
+      ],
+      "recommendedUse": [
+        "Strict bounded profile-label wiring slices",
+        "Medium multi-component TypeScript/React Native refactors with explicit file scopes",
+        "Compatibility-preserving UI configuration moves",
+        "Follow-up implementation after a separate scout audit identifies exact targets"
+      ],
+      "avoidFor": [
+        "Persistence migrations or backup/import/export work until separately proven",
+        "Broad architecture decisions without a bounded implementation target",
+        "Loose exploratory implementation prompts where scope and exact strings are not explicit"
+      ],
+      "promptImprovements": [
+        "Keep using strict bounded tickets with exact strings and exact allowed files for Kimi K2.6.",
+        "Ask the worker to update handoff verification titles/results, not only implemented-so-far bullets.",
+        "For profile-label slices, require rg proof for both profile access and removal of old hardcoded strings.",
+        "When scout audits feed implementation prompts, include Codex-verified missed labels in the ticket."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest"
+      ],
+      "tags": [
+        "review-ui",
+        "profile-labels",
+        "ReviewProfile",
+        "strict-bounded-ticket",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "review-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "profile-label-wiring",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-loose-implementation-prompts"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-graph-profile-labels",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Graph UI profile-label wiring slice",
+      "slice": "Move hardcoded graph screen and graph mode labels into GraphProfile while preserving exact coding wording.",
+      "difficulty": "small-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/graph/ui/GraphScreen.tsx",
+        "src/features/graph/ui/GraphModeBar.tsx",
+        "src/features/graph/ui/NodePreviewTooltip.tsx",
+        "src/features/graph/ui/GraphLegend.tsx",
+        "src/features/graph/engine/visualEncoding.ts",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can repeat the profile-label wiring pattern on graph UI with precise scope and rg verification.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 remains reliable for strict bounded profile-label wiring tickets.",
+        "Keep exact allowed files and old-string rg checks in the prompt.",
+        "Ask it to update handoff verification blocks, not just implementation bullets, because Codex had to fix that again.",
+        "For broader label cleanup, split remaining labels into small surfaces rather than handing over all hardcoded UI strings at once."
+      ],
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/graph/ui/GraphScreen.tsx",
+        "src/features/graph/ui/GraphModeBar.tsx",
+        "src/features/graph/ui/NodePreviewTooltip.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and a small handoff verification/next-step correction; no production code changes were needed after worker implementation.",
+      "strengths": [
+        "Stayed inside the allowed graph/profile/handoff scope.",
+        "Moved the requested graph screen title, focused title, view labels, empty label, and mode labels into GraphProfile.",
+        "Preserved exact current coding wording.",
+        "Did not touch graph data queries, layout, gestures, visual encoding, colors, relationships, or compatibility boundaries.",
+        "Added codingProfile test coverage for the new graph UI labels.",
+        "Ran TypeScript, targeted profile test, full suite, and rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens graph profile seam without disturbing existing relationshipLabels and relationshipSectionLabels.",
+        "Kept GraphNode.typeNodeId and LearningConcept.conceptType boundaries untouched.",
+        "Correctly left NodePreviewTooltip strength description out of scope and explained the remaining rg hit."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript profile interface extension and React Native UI label wiring cleanly.",
+        "Used existing profile access patterns in TSX components.",
+        "Added focused Vitest assertions for profile configuration values."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong at repeated strict bounded ticket execution.",
+        "Good at moving literals into profile/config objects without behavior changes.",
+        "Good at compatibility-boundary preservation and rg-based final reporting."
+      ],
+      "misses": [
+        "The handoff latest verification block still referenced the prior review UI slice until Codex corrected it.",
+        "GraphProfile.modeLabels uses a broad Record<string, string> shape; acceptable for this slice but less precise than a dedicated graph mode key type.",
+        "Several graph helper labels remain hardcoded because they were explicitly out of scope."
+      ],
+      "reviewerFixes": [
+        "Verified actual diff, scope, rg results, TypeScript, targeted profile test, and full suite.",
+        "Updated implementation_handoff.md latest verification block to graph UI profile-label wiring with 12/12 and 335/335 results.",
+        "Updated handoff next-step queue to mark graph UI label wiring done and list remaining label candidates.",
+        "No production code changes were required after Kimi K2.6 implementation."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 12/12 passed",
+        "npm test -- --run: 335/335 passed across 49 files",
+        "rg old target graph labels in src/features/graph/ui: only NodePreviewTooltip Strength data-description remained, out of scope",
+        "rg profile graph access in src/features/graph/ui: GraphScreen and GraphModeBar now read profile.graph; GraphLegend pre-existing relationship labels unchanged"
+      ],
+      "recommendedUse": [
+        "Strict bounded profile-label wiring slices",
+        "Small/medium TypeScript React Native UI configuration moves",
+        "Follow-up implementation after exact labels are known",
+        "Compatibility-preserving UI refactors with explicit rg checks"
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration work until separately proven",
+        "Loose broad UI sweeps without exact target strings and scopes",
+        "Architecture decisions about profile schema grouping without orchestrator review"
+      ],
+      "promptImprovements": [
+        "Explicitly require the handoff latest verification block and next-step queue to be updated when docs are in scope.",
+        "If a map is keyed by a known union, ask for a typed key shape when feasible.",
+        "Continue requiring old-string rg checks and explanation of every remaining hit."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest"
+      ],
+      "tags": [
+        "graph-ui",
+        "profile-labels",
+        "GraphProfile",
+        "strict-bounded-ticket",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "graph-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "profile-label-wiring",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-loose-ui-sweeps",
+        "watch-doc-verification-staleness"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-learning-ui-profile-labels",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Learning UI profile-label wiring slice",
+      "slice": "Move LearningHub review entry text, ConceptListSection title/sort label, and SessionFlashback empty-state label into DomainLabels while preserving exact coding wording.",
+      "difficulty": "small-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/ui/LearningHubScreen.tsx",
+        "src/features/learning/ui/ConceptListSection.tsx",
+        "src/features/learning/ui/SessionFlashbackScreen.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can continue profile-label cleanup on a small Learning UI slice and follow the new handoff-update policy.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 followed the explicit handoff-update policy correctly on this run.",
+        "Keep using exact old-string targets and old-string/profile-access rg checks.",
+        "For future label slices, decide whether feature-specific labels belong in DomainLabels or a sub-profile before prompting.",
+        "Kimi can now handle a sequence of small/medium strict bounded profile-label wiring tasks with low production-code review burden."
+      ],
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/ui/LearningHubScreen.tsx",
+        "src/features/learning/ui/ConceptListSection.tsx",
+        "src/features/learning/ui/SessionFlashbackScreen.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after reviewer verification; no CodeLens code or documentation fixes were needed.",
+      "strengths": [
+        "Stayed inside the allowed write scope.",
+        "Moved all four requested Learning UI labels into DomainLabels and preserved exact coding wording.",
+        "Kept structural names and compatibility boundaries untouched.",
+        "Updated the codingProfile label test without increasing unnecessary test surface.",
+        "Followed the handoff-update policy: implemented-so-far, files changed, latest verification, and next-step queue were updated.",
+        "Ran TypeScript, targeted profile test, full suite, and required rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Understood which Learning UI strings were domain labels and which structural capture/concept identifiers should remain.",
+        "Preserved LearningConcept.conceptType, ConceptHint.proposedConceptType, card boundary props, and existing profile sections.",
+        "Correctly reported remaining out-of-scope labels such as ConceptListSection empty text and graph helper labels."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript profile interface extension and React Native UI label wiring cleanly.",
+        "Used existing profile access patterns without changing component behavior.",
+        "Kept tests focused on profile config values."
+      ],
+      "generalizedCodingStrengths": [
+        "Very strong at strict bounded profile-label wiring tickets.",
+        "Good at following improved prompt policies after HR feedback.",
+        "Good scope control and final reporting.",
+        "Low reviewer burden on production code for this task class."
+      ],
+      "misses": [
+        "Score is not 10 because the choice to place all four labels directly on DomainLabels is pragmatic but may become less elegant if many feature-specific labels accumulate there.",
+        "A few related hardcoded labels remain by design because they were out of scope; this was correct, but the profile-label sweep is not complete globally."
+      ],
+      "reviewerFixes": [
+        "Verified actual diff, scope, rg results, TypeScript, targeted profile test, and full suite.",
+        "No CodeLens production-code changes were required.",
+        "No handoff correction was required after this run.",
+        "Updated Pi HR database/docs/viewer."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 12/12 passed",
+        "npm test -- --run: 335/335 passed across 49 files",
+        "rg old target Learning UI labels: zero hits in src/features/learning/ui",
+        "rg profile access: LearningHubScreen, ConceptListSection, and SessionFlashbackScreen now read profile labels"
+      ],
+      "recommendedUse": [
+        "Strict bounded profile-label wiring slices",
+        "Small/medium TypeScript React Native UI cleanup with explicit old-string targets",
+        "Follow-up implementation after scout/audit findings are verified",
+        "Documentation-in-scope tickets when the handoff update policy is explicit"
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration work until separately proven",
+        "Large unbounded UI label sweeps without prior classification",
+        "Profile schema architecture decisions that require product judgment before implementation"
+      ],
+      "promptImprovements": [
+        "The handoff_update_policy worked; keep it in future docs-in-scope prompts.",
+        "For labels that could belong to multiple profile sections, include placement guidance or ask the worker to justify the choice.",
+        "Continue requiring profile-access rg and old-string rg checks before final report."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest"
+      ],
+      "tags": [
+        "learning-ui",
+        "profile-labels",
+        "DomainLabels",
+        "strict-bounded-ticket",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "learning-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "profile-label-wiring",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware",
+        "documentation-discipline"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-unclassified-broad-label-sweeps",
+        "watch-profile-label-sprawl"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-learning-helper-labels",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Learning UI helper-label profile wiring slice",
+      "slice": "Move ConceptListSection empty body text and SessionFlashbackScreen helper labels into profile-owned labels, nesting flashback labels under DomainLabels.flashback.",
+      "difficulty": "small-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/ui/ConceptListSection.tsx",
+        "src/features/learning/ui/SessionFlashbackScreen.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can apply profile-label placement guidance, avoid flat label sprawl, and keep a helper-label slice behavior-preserving.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 handled nested profile label placement correctly when the prompt gave explicit placement guidance.",
+        "It can be trusted for further strict bounded label/profile cleanup with exact scopes.",
+        "Keep dynamic count/pluralization out of scope unless the prompt explicitly asks for it.",
+        "The handoff_update_policy continued to work; keep it for documentation-in-scope tickets."
+      ],
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/ui/ConceptListSection.tsx",
+        "src/features/learning/ui/SessionFlashbackScreen.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after reviewer verification; no CodeLens code or documentation fixes were needed.",
+      "strengths": [
+        "Stayed inside allowed write scope.",
+        "Moved every requested static helper label to profile-owned labels while preserving exact coding wording.",
+        "Followed placement guidance by nesting flashback-specific labels under DomainLabels.flashback instead of adding more flat fields.",
+        "Safely migrated the existing flashback empty label into the nested shape because all call sites were in scope.",
+        "Left dynamic count/pluralization strings unchanged as instructed.",
+        "Updated handoff implemented-so-far, latest verification, and next-step queue correctly.",
+        "Ran TypeScript, targeted profile test, full suite, and required rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Improved CodeLens profile shape by grouping SessionFlashback labels coherently.",
+        "Preserved structural learning/concept/capture names and compatibility boundaries.",
+        "Correctly reported the remaining graph helper labels and Unknown date fallback as out of scope."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript interface reorganization and React Native UI label wiring cleanly.",
+        "Updated tests for profile config shape without broad snapshots.",
+        "Maintained behavior while moving text into config/profile definitions."
+      ],
+      "generalizedCodingStrengths": [
+        "Very strong at strict bounded profile-label wiring tasks.",
+        "Good at applying prompt feedback from previous evaluations.",
+        "Good documentation discipline when explicitly prompted.",
+        "Good at separating required work from optional dynamic/pluralization changes."
+      ],
+      "misses": [
+        "Score is not 10 because the profile-label sweep still leaves graph helper labels and the Unknown date fallback for future decisions.",
+        "No production issue, scope issue, test issue, or handoff issue was found."
+      ],
+      "reviewerFixes": [
+        "Verified actual diff, scope, rg results, TypeScript, targeted profile test, and full suite.",
+        "No CodeLens production-code changes were required.",
+        "No handoff correction was required.",
+        "Updated Pi HR database/viewer."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 12/12 passed",
+        "npm test -- --run: 335/335 passed across 49 files",
+        "rg old target helper labels in target UI files: zero hits",
+        "rg flashbackEmptyLabel/profile labels: flat flashbackEmptyLabel fully removed; nested profile labels used in SessionFlashbackScreen"
+      ],
+      "recommendedUse": [
+        "Strict bounded profile-label wiring slices",
+        "Small TypeScript profile-shape reorganizations with all call sites in scope",
+        "Behavior-preserving React Native UI config moves",
+        "Documentation-in-scope tasks with explicit handoff policy"
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration work until separately proven",
+        "Broad profile architecture redesign without orchestrator direction",
+        "Unbounded UI copy sweeps without old-string targets and placement guidance"
+      ],
+      "promptImprovements": [
+        "The placement guidance worked; continue specifying flat vs nested profile-label placement in prompts.",
+        "For dynamic count strings, explicitly state whether they are in or out of scope.",
+        "Keep requiring rg proof that old strings are removed from target UI files."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest"
+      ],
+      "tags": [
+        "learning-ui",
+        "helper-labels",
+        "profile-labels",
+        "DomainLabels.flashback",
+        "strict-bounded-ticket",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "learning-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "profile-label-wiring",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware",
+        "documentation-discipline"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-unbounded-profile-redesign",
+        "watch-remaining-helper-labels"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-graph-helper-labels",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Graph helper-label profile wiring slice",
+      "slice": "Move GraphScreen status/cap labels, NodePreviewTooltip descriptions/actions, and GraphLegend helper descriptions into nested GraphProfile label groups.",
+      "difficulty": "medium-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/graph/ui/GraphScreen.tsx",
+        "src/features/graph/ui/NodePreviewTooltip.tsx",
+        "src/features/graph/ui/GraphLegend.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can handle a slightly larger graph UI helper-label slice with nested profile groups and template replacement while preserving behavior.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 remains strong for profile-label wiring but still needs handoff verification counts checked by Codex.",
+        "For prompts with regex searches, include exact old strings rather than approximate variants so workers do not miss audit coverage.",
+        "Keep template replacement requirements explicit when moving dynamic labels.",
+        "Consider asking for a final git diff self-check against the final report when docs are in scope."
+      ],
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/graph/ui/GraphScreen.tsx",
+        "src/features/graph/ui/NodePreviewTooltip.tsx",
+        "src/features/graph/ui/GraphLegend.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and a one-line handoff test-count correction; no production code changes were needed after worker implementation.",
+      "strengths": [
+        "Stayed inside allowed write scope.",
+        "Moved requested graph helper labels into nested GraphProfile groups: statusLabels, tooltipLabels, and legendHelperLabels.",
+        "Preserved exact coding wording and graph behavior.",
+        "Kept graph queries, layout, gestures, visual encoding, colors, relationships, and compatibility boundaries untouched.",
+        "Handled template replacement for cap banner, last-accessed, score, and strength text.",
+        "Added focused codingProfile assertions for new graph helper labels.",
+        "Ran TypeScript, targeted profile test, full suite, and rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Completed the remaining CodeLens graph helper-label profile seam without disturbing graph internals.",
+        "Preserved existing GraphProfile relationshipLabels, relationshipSectionLabels, modeLabels, and screen labels.",
+        "Correctly left GraphLegend title and structural navigation symbols out of scope."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript nested profile interface growth and React Native UI wiring across multiple components.",
+        "Used simple template replacement without changing number/date/pluralization logic.",
+        "Maintained focused test coverage on profile config values."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong at bounded profile-label wiring across multiple UI files.",
+        "Good at preserving dynamic behavior while moving surrounding label templates into config.",
+        "Good scope control and compatibility-boundary reasoning."
+      ],
+      "misses": [
+        "implementation_handoff.md latest verification had full suite 335/335 while actual/full reported result was 336/336; Codex corrected the handoff count.",
+        "The required rg pattern from the prompt used an approximate old string for one legend label, so Codex ran an extra exact-old-string check for the actual old legend strings.",
+        "GraphLegend still calls getActiveDomainProfile() directly for relationship labels instead of reusing the local profile variable; harmless but slightly redundant."
+      ],
+      "reviewerFixes": [
+        "Verified actual diff, scope, required rg checks, extra exact old-string search, TypeScript, targeted profile test, and full suite.",
+        "Updated implementation_handoff.md full-suite count from 335/335 to 336/336.",
+        "No production code changes were required.",
+        "Updated Pi HR database/viewer."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 13/13 passed",
+        "npm test -- --run: 336/336 passed across 49 files",
+        "required old-string rg on target graph UI files: zero hits",
+        "extra exact old-string rg for Yellow/Blue/Grey/Small-to-large helper labels: zero hits"
+      ],
+      "recommendedUse": [
+        "Strict bounded profile-label wiring slices",
+        "Medium TypeScript React Native UI config moves with template labels",
+        "Behavior-preserving UI text refactors with explicit rg checks",
+        "Nested profile label grouping when orchestrator provides shape guidance"
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration work until separately proven",
+        "Unbounded broad UI copy rewrites",
+        "Tasks where documentation accuracy cannot be reviewed"
+      ],
+      "promptImprovements": [
+        "Ask the worker to verify handoff test counts against actual command output before final report.",
+        "Use exact old strings in rg checks; avoid approximate labels like Blue: older when the UI says Blue: 1-3 months.",
+        "Ask workers to reuse an already-created profile variable where possible when adding profile reads in a component."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest"
+      ],
+      "tags": [
+        "graph-ui",
+        "helper-labels",
+        "profile-labels",
+        "GraphProfile",
+        "strict-bounded-ticket",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "graph-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "profile-label-wiring",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware",
+        "documentation-discipline"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "watch-doc-verification-staleness",
+        "watch-approximate-rg-patterns"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-dynamic-fallback-labels",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi / OpenCode Go",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Dynamic/fallback label profile wiring slice",
+      "slice": "Move SessionFlashback Unknown/count labels and NodePreviewTooltip day-count labels into profile-owned templates while preserving exact coding wording.",
+      "difficulty": "small-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/ui/SessionFlashbackScreen.tsx",
+        "src/features/graph/ui/NodePreviewTooltip.tsx",
+        "src/features/graph/ui/GraphScreen.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can safely profile-drive dynamic count/pluralization strings without changing exact rendered wording.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 needs extra guardrails when existing generic labels differ in capitalization from local dynamic text.",
+        "For dynamic count/pluralization slices, require examples for 1 and 2 counts in the final report or tests.",
+        "Do not assume itemSingular/captureSingular can replace local lowercase words; verify exact rendering.",
+        "Consider adding direct behavior tests when dynamic templates are changed, not only profile value assertions."
+      ],
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/learning/ui/SessionFlashbackScreen.tsx",
+        "src/features/graph/ui/NodePreviewTooltip.tsx",
+        "src/features/graph/ui/GraphScreen.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "medium",
+      "score": 7,
+      "outcome": "Accepted after reviewer production fix and verification. The worker moved the labels but initially changed rendered capitalization for concept/capture counts.",
+      "strengths": [
+        "Stayed inside allowed write scope.",
+        "Moved Unknown fallback and day-count tooltip labels into appropriate profile sections.",
+        "Kept graph cap banner unchanged as requested.",
+        "Updated handoff verification and next-step queue correctly.",
+        "Ran TypeScript, targeted profile test, full suite, and required rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Used the existing nested flashback and GraphProfile tooltip label areas instead of adding unrelated flat labels.",
+        "Preserved core compatibility boundaries and avoided persistence or behavior-heavy systems.",
+        "Left graph cap logic untouched because it was already profile-driven."
+      ],
+      "generalizedStackStrengths": [
+        "Can wire dynamic label templates through TypeScript/React Native components.",
+        "Can keep scope controlled on small UI/profile slices.",
+        "Uses profile config tests consistently."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong scope control remains reliable.",
+        "Good at following file boundaries and handoff update policy.",
+        "Needs stricter exact-rendering checks for dynamic/pluralized text."
+      ],
+      "misses": [
+        "Used profile.labels.itemSingular/itemPlural and captureSingular/capturePlural for flashback counts, which would render capitalized Concept/Capture instead of the previous lowercase concept/capture.",
+        "Profile config tests did not catch the rendered capitalization regression.",
+        "Final report claimed exact current wording was preserved, but Codex source review found otherwise."
+      ],
+      "reviewerFixes": [
+        "Added flashback-specific lowercase count labels: conceptCountSingularLabel, conceptCountPluralLabel, captureCountSingularLabel, captureCountPluralLabel.",
+        "Updated codingProfile and codingProfile.test.ts for the lowercase labels.",
+        "Updated SessionFlashbackScreen to use flashback-specific lowercase count labels instead of generic capitalized DomainLabels.",
+        "Verified TypeScript, targeted profile test, full suite, and rg checks after the fix."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed after reviewer fix",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 13/13 passed after reviewer fix",
+        "npm test -- --run: 336/336 passed across 49 files after reviewer fix",
+        "rg old dynamic/fallback strings in target files: only structural variable/profile-read hits remain"
+      ],
+      "recommendedUse": [
+        "Strict bounded static profile-label wiring slices",
+        "Dynamic label/template slices only with explicit rendered examples and reviewer scrutiny",
+        "Documentation-in-scope tickets with explicit handoff policy"
+      ],
+      "avoidFor": [
+        "Dynamic/pluralization changes without direct expected-rendered-output examples",
+        "Tasks where capitalization/grammar regressions are hard to notice from profile config tests alone",
+        "Persistence, backup/import/export, restore, or migration work until separately proven"
+      ],
+      "promptImprovements": [
+        "For dynamic count labels, require the worker to show expected output for count=1 and count=2 before and after.",
+        "When generic profile labels are capitalized for headings, do not let workers reuse them for inline lowercase grammar unless exact rendering is proven.",
+        "Add direct behavior tests or tiny pure helpers for dynamic label formatting when feasible."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest",
+        "manual rendered-string reasoning"
+      ],
+      "tags": [
+        "dynamic-labels",
+        "pluralization",
+        "profile-labels",
+        "SessionFlashbackScreen",
+        "NodePreviewTooltip",
+        "medium"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "learning-ui",
+        "graph-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "profile-label-wiring",
+        "scope-control",
+        "test-discipline",
+        "dynamic-label-risk",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-dynamic-text-regressions",
+        "watch-capitalization-regressions",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-04-qwen-3-6-plus-graph-legend-title",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi / OpenCode worker",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-label-wiring",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/graph/ui/GraphLegend.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Qwen 3.6 Plus can execute a tiny strict profile-label polish slice without scope creep after the larger label sweep.",
+      "promptAdaptationNotes": [
+        "Qwen 3.6 Plus is reliable on small explicit TypeScript/profile wiring tickets.",
+        "Ask it to avoid redundant access patterns when introducing a local profile variable.",
+        "Keep using exact old-string rg checks for final label polish."
+      ],
+      "task": "GraphLegend title profile-label wiring slice",
+      "slice": "Move the remaining GraphLegend header title \"Legend\" into GraphProfile while preserving exact coding wording.",
+      "difficulty": "small",
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after reviewer verification and one tiny code-quality cleanup. No behavior changes or test fixes were needed.",
+      "filesChanged": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/graph/ui/GraphLegend.tsx",
+        "src/features/ontology/__tests__/codingProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "strengths": [
+        "Kept the implementation focused on the single remaining GraphLegend title label.",
+        "Placed the new field inside the existing GraphProfile legendHelperLabels group instead of adding another flat DomainLabels entry.",
+        "Preserved exact rendered wording for the coding profile.",
+        "Updated the profile value test and handoff documentation.",
+        "Reported useful rg checks and full verification."
+      ],
+      "projectSpecificStrengths": [
+        "Followed the ontology-profile label placement pattern already established in CodeLens RN.",
+        "Respected GraphNode.typeNodeId and LearningConcept.conceptType compatibility boundaries.",
+        "Left structural navigation and graph behavior untouched."
+      ],
+      "generalizedStackStrengths": [
+        "Can make small TypeScript interface additions and propagate them through React Native TSX call sites.",
+        "Can update Vitest profile assertions for config-driven UI labels.",
+        "Good fit for explicit file-scope React Native cleanup tasks."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong scope control on tiny bounded tickets.",
+        "Good profile/config wiring judgment.",
+        "Good final reporting discipline.",
+        "Preserved compatibility boundaries."
+      ],
+      "misses": [
+        "Left one redundant getActiveDomainProfile() call in LegendBody even after introducing a local profile variable; Codex cleaned it up.",
+        "Score is not 10 because reviewer still had to inspect and make a minor code-quality edit, and the task was too small to prove broader autonomy."
+      ],
+      "reviewerFixes": [
+        "Changed GraphLegend LegendBody structure branch to reuse profile.graph.relationshipLabels instead of calling getActiveDomainProfile() again.",
+        "Ran exact old-string rg checks, TypeScript, targeted profile test, and full Vitest suite."
+      ],
+      "verification": [
+        "rg old GraphLegend title string: no hardcoded \"Legend\" UI string remains; only structural identifiers GraphLegend/LegendBody remain",
+        "rg profile graph access: GraphLegend title uses profile.graph.legendHelperLabels.title and helper labels use profile.graph.legendHelperLabels",
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: clean",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts: 13/13 passed",
+        "npm test -- --run: 336/336 passed across 49 test files"
+      ],
+      "recommendedUse": [
+        "Tiny or small strict bounded TypeScript UI/profile wiring slices.",
+        "Compatibility-preserving API or config propagation tasks with explicit allowed files.",
+        "Final cleanup tickets after a stronger orchestrator defines exact scope."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration work until separately proven.",
+        "Large autonomous architecture planning without Codex decomposition.",
+        "Tasks where a small redundant access pattern would be costly unless tests or review catch it."
+      ],
+      "promptImprovements": [
+        "When introducing a local profile/config variable, ask the worker to reuse it consistently and avoid duplicate accessor calls.",
+        "Keep exact old-string rg checks in the prompt even for tiny label moves.",
+        "For tiny polish tasks, require the final report to distinguish structural identifier hits from user-facing string hits."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest profile tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "profile-labels",
+        "graph-ui",
+        "GraphLegend",
+        "small",
+        "strict-bounded-ticket"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "graph-ui",
+        "domain-label-sweep"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "profile-label-wiring",
+        "scope-control",
+        "test-discipline",
+        "compatibility-boundary",
+        "reporting",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-redundant-access-patterns",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-04-qwen-3-6-plus-correction-evidence-groundwork",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi / OpenCode worker",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "domain-shape-groundwork",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/03_CATEGORIZATION_AND_ONTOLOGY_CHECKER.md",
+        "ONTOLOGY_PROFILE_REFACTOR/04_REFACTOR_WITHOUT_BREAKING_APP.md",
+        "ONTOLOGY_PROFILE_REFACTOR/02_DYNAMIC_PROFILE_SCHEMA.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Qwen can implement a small profile-aware domain type/helper slice with tests while staying away from persistence and UI.",
+      "promptAdaptationNotes": [
+        "Qwen is reliable for small TypeScript domain/API groundwork when the write scope is explicit.",
+        "When a field is optional or nullable, require separate omitted and null test cases in the prompt.",
+        "Keep persistence and UI explicitly out of scope for early ontology checker groundwork slices."
+      ],
+      "task": "Ontology correction evidence groundwork slice",
+      "slice": "Add ontology correction evidence types plus a pure validateOntologyCorrection helper and focused tests, without persistence, UI, or automatic profile mutation.",
+      "difficulty": "small-bounded-refactor",
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/corrections.ts",
+        "src/features/ontology/__tests__/corrections.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after a small reviewer type/test fix. The implementation was scoped, domain-only, and verified; Codex changed reason from required nullable to optional nullable and added an omitted-reason test.",
+      "filesChanged": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/corrections.ts",
+        "src/features/ontology/__tests__/corrections.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "strengths": [
+        "Stayed inside the explicit allowed write scope.",
+        "Added a small domain-only correction evidence shape without touching DB, migrations, backup/import/export, or UI.",
+        "Implemented validateOntologyCorrection as a pure helper returning validation errors instead of mutating profile state.",
+        "Covered the main requested validation cases with focused tests.",
+        "Updated the handoff documentation and reported the required rg checks and verification commands."
+      ],
+      "projectSpecificStrengths": [
+        "Respected the CodeLens ontology-profile rule that user corrections are evidence, not automatic profile mutations.",
+        "Kept LearningConcept.conceptType, ConceptHint.proposedConceptType, and persistence column boundaries untouched.",
+        "Used the existing codingProfile as the active validation profile in tests."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript domain type additions and exports cleanly.",
+        "Added small Vitest coverage for pure validation behavior.",
+        "Kept a React Native feature-folder codebase scoped to the requested feature module."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at strict bounded TypeScript groundwork slices.",
+        "Good scope control when persistence and UI are explicitly excluded.",
+        "Good compatibility-boundary discipline.",
+        "Needs prompts to spell out optional/null test cases separately when exact shape semantics matter."
+      ],
+      "misses": [
+        "Made reason a required nullable field even though the prompt asked for optional/null reason text.",
+        "Did not include an omitted-reason test until Codex added it.",
+        "Score is not 10 because a small shape fix and test were needed before acceptance."
+      ],
+      "reviewerFixes": [
+        "Changed OntologyCorrectionEvidence.reason to reason?: string | null | undefined.",
+        "Added a corrections test proving omitted reason is valid.",
+        "Updated the handoff verification count from 25/348 to 26/349 after the reviewer fix.",
+        "Ran TypeScript, targeted ontology tests, full Vitest suite, and required rg checks."
+      ],
+      "verification": [
+        "rg \"ontology_corrections|ontology_patch_suggestions\" src: zero hits, so no persistence/table implementation was added.",
+        "rg \"OntologyCorrection|CorrectionEvidence|validateOntologyCorrection\" src/features/ontology: hits confined to ontology types, exports, helper, and tests.",
+        "rg \"conceptType|typeNodeId|proposedConceptType|proposedTypeNodeId\" src/features/ontology: only new typeNodeId correction field/test usage plus pre-existing codingProfile embedding conceptType hit.",
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed after reviewer fix.",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts src/features/ontology/__tests__/corrections.test.ts: 26/26 passed after reviewer fix.",
+        "npm test -- --run: 349/349 passed across 50 files after reviewer fix."
+      ],
+      "recommendedUse": [
+        "Small TypeScript domain-shape groundwork slices.",
+        "Pure helper and validation utility additions with focused tests.",
+        "Compatibility-preserving ontology/profile API additions under explicit scope."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration work without strict raw-shape tests and reviewer oversight.",
+        "Broad UI correction flow implementation until decomposed into a strict bounded ticket.",
+        "Ambiguous schema work where optional vs nullable semantics are not explicitly tested."
+      ],
+      "promptImprovements": [
+        "When asking for optional/null fields, require tests for both omitted and explicit null values.",
+        "For validation helper slices, explicitly state whether runtime validation of closed union fields is required or compile-time typing is sufficient.",
+        "Keep no-persistence/no-UI boundaries explicit for early ontology checker groundwork."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "ontology-corrections",
+        "correction-evidence",
+        "domain-types",
+        "validation-helper",
+        "strict-bounded-ticket",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "ontology-corrections",
+        "checker-groundwork"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "domain-modeling",
+        "validation-helper",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-optional-nullable-shapes",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-05-deepseek-v4-pro-correction-guards",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "DeepSeek V4 Pro",
+      "runner": "Pi / OpenCode worker",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "test-only guard",
+      "taskType": "source-guard-tests",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/03_CATEGORIZATION_AND_ONTOLOGY_CHECKER.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/corrections.ts",
+        "src/features/ontology/__tests__/corrections.test.ts",
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "allowedWriteScopeStyle": "single test file",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether DeepSeek V4 Pro can add focused source-level architecture guards without production edits.",
+      "promptAdaptationNotes": [
+        "DeepSeek V4 Pro remains a good fit for test-only source guards with precise forbidden patterns and one-file write scope.",
+        "Ask for exact counts of new it/test blocks and actual Vitest split if reporting precision matters.",
+        "Tell it to avoid overclaiming that source guards eliminate all future risk."
+      ],
+      "task": "Ontology correction evidence architecture guard slice",
+      "slice": "Add source-level stage10 guards that keep correction evidence domain-only and prevent persistence strings, forbidden imports, and obvious profile mutation helpers during this stage.",
+      "difficulty": "small-test-only-guard",
+      "allowedWriteScope": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and small doc/comment cleanup. The guard implementation was useful and test-only, but the final report overstated the number of new test blocks and overclaimed remaining risk.",
+      "filesChanged": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "strengths": [
+        "Stayed within the single allowed test file and made no production code changes.",
+        "Added source-level guards for correction evidence shape, narrow field/source unions, barrel export, forbidden imports, persistence table strings, and obvious profile mutation helper names.",
+        "Used existing stage10 source-guard style and source file traversal helpers.",
+        "Ran TypeScript, targeted tests, full suite, and required rg searches.",
+        "Kept the guard focused on the current domain-only correction evidence boundary."
+      ],
+      "projectSpecificStrengths": [
+        "Protected the CodeLens rule that correction evidence is not persistence or automatic profile mutation yet.",
+        "Reinforced the ontology feature boundary after Qwen added the correction evidence helper.",
+        "Avoided touching learning, graph, persistence, backup/import/export, and UI files."
+      ],
+      "generalizedStackStrengths": [
+        "Good at Vitest source-level architecture guards in a TypeScript repo.",
+        "Can use regex/source traversal patterns to enforce feature boundaries.",
+        "Works well with a one-file test-only write scope."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong fit for regression-guarding tasks.",
+        "Good scope control under strict prompts.",
+        "Good at converting architecture constraints into source assertions.",
+        "Needs reviewer attention on final-report precision and residual-risk language."
+      ],
+      "misses": [
+        "Reported 8 new guard tests, but the actual diff added 7 new it(...) blocks; one listed guard was covered inline rather than as a separate test.",
+        "Reported a misleading targeted test split; actual targeted run was 30 total across stage10 guards and corrections tests, not the stated 14 stage10 + 16 corrections split.",
+        "Claimed remaining risks were none and that the groundwork was fully guarded, which overstates what source-level regex guards can prove.",
+        "Introduced non-ASCII dash characters in comments, which Codex normalized."
+      ],
+      "reviewerFixes": [
+        "Changed new comments in stage10-architecture-guards.test.ts to ASCII hyphens.",
+        "Updated ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md to record the guard slice and latest verification counts.",
+        "Verified the actual diff, required rg searches, TypeScript, targeted tests, and full suite."
+      ],
+      "verification": [
+        "git diff review: only stage10 architecture guard test changed by worker; no production code changes.",
+        "rg \"OntologyCorrectionEvidence|validateOntologyCorrection|OntologyCorrectionField|OntologyCorrectionSource\" src: hits in ontology feature and the new stage10 guard test.",
+        "rg \"ontology_corrections|ontology_patch_suggestions\" src: only the stage10 guard test hit.",
+        "rg \"applyOntologyCorrection|mutateProfile|applyProfilePatch\" src/features/ontology: zero hits.",
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed after reviewer comment cleanup.",
+        "npm test -- --run src/__tests__/stage10-architecture-guards.test.ts src/features/ontology/__tests__/corrections.test.ts: 30/30 passed after reviewer comment cleanup.",
+        "npm test -- --run: 356/356 passed across 50 files after reviewer comment cleanup."
+      ],
+      "recommendedUse": [
+        "Focused test-only regression guard slices.",
+        "Source-level architecture boundary guards with explicit forbidden patterns.",
+        "One-file Vitest guard additions after implementation slices."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, or migration implementation work.",
+        "Broad implementation slices where it may overclaim safety.",
+        "Tasks where final-report counts must be accepted without reviewer verification."
+      ],
+      "promptImprovements": [
+        "For test-only guard tasks, require the worker to report the actual number of new it(...) blocks separately from logical assertions covered inline.",
+        "Require residual risk language to distinguish source-level guard coverage from full behavioral proof.",
+        "Keep one-file write scope for DeepSeek V4 Pro guard tasks."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "test-only-guard",
+        "source-guards",
+        "ontology-corrections",
+        "architecture-guards",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "ontology-corrections",
+        "stage10-guards"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "regression-guarding",
+        "source-guards",
+        "bounded-refactor",
+        "scope-control",
+        "test-discipline",
+        "compatibility-boundary",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-reporting-counts",
+        "watch-overclaiming-guard-coverage",
+        "avoid-persistence-without-review"
+      ]
     }
   ],
   "generalizedLessons": [
@@ -1080,19 +2485,78 @@
         "Qwen 3.6 Plus",
         "future compatibility-alias workers"
       ]
+    },
+    {
+      "id": "read-only-label-audits",
+      "lesson": "Read-only label audits are useful scout tasks for untested models, but prompts must explicitly include placeholders, conditional labels, empty states, subtitles, and error text; Codex should verify a sample before turning findings into implementation tickets.",
+      "appliesTo": [
+        "DeepSeek V4 Flash",
+        "future read-only scout workers"
+      ]
+    },
+    {
+      "id": "scout-audit-to-bounded-ticket",
+      "lesson": "A read-only scout audit can find useful label/profile hotspots, but Codex should verify and refine the target list before giving a strict bounded implementation ticket to a proven worker.",
+      "appliesTo": [
+        "DeepSeek V4 Flash",
+        "Kimi K2.6",
+        "future scout-to-implementation workflows"
+      ]
+    },
+    {
+      "id": "handoff-verification-docs",
+      "lesson": "When handoff docs are in scope, prompts should explicitly require updating both the implemented-so-far bullets and the latest verification/next-step sections; otherwise strong workers may leave stale verification text.",
+      "appliesTo": [
+        "Kimi K2.6",
+        "future documentation-in-scope implementation tickets"
+      ]
+    },
+    {
+      "id": "profile-label-placement-guidance",
+      "lesson": "For profile-label wiring slices, prompts should say whether labels belong in DomainLabels or a feature sub-profile; otherwise workers may choose a pragmatic flat placement that is correct for the slice but may grow awkward later.",
+      "appliesTo": [
+        "Kimi K2.6",
+        "future profile-label wiring workers"
+      ]
+    },
+    {
+      "id": "dynamic-label-scope",
+      "lesson": "For UI label cleanup, explicitly state whether dynamic count/pluralization strings are in scope. Leaving them out can keep a profile-label slice behavior-preserving and easier to review.",
+      "appliesTo": [
+        "Kimi K2.6",
+        "future profile-label wiring workers"
+      ]
+    },
+    {
+      "id": "exact-rg-patterns",
+      "lesson": "Required rg checks should use exact old strings from the UI, not approximate paraphrases; otherwise a worker can report zero hits while missing coverage of the actual old string.",
+      "appliesTo": [
+        "Kimi K2.6",
+        "future terminology/profile-label workers"
+      ]
+    },
+    {
+      "id": "dynamic-rendered-output-examples",
+      "lesson": "For dynamic/pluralized UI label changes, require rendered examples for singular and plural cases; profile value tests alone may miss capitalization or grammar regressions.",
+      "appliesTo": [
+        "Kimi K2.6",
+        "future dynamic label workers"
+      ]
     }
   ],
   "promptStyleTaxonomy": {
     "strict bounded ticket": "Exact context files, explicit write scope, compatibility boundaries, verification commands, rg/search requirements, and final report format.",
     "test-only guard": "Production code is out of scope; worker adds regression or architecture guards for a known failure mode.",
     "architecture/doc guard": "Documentation and source-level architecture guard hardening after implementation slices.",
-    "loose exploratory": "Read-only or planning-oriented investigation with more autonomy; avoid for destructive or persistence work."
+    "loose exploratory": "Read-only or planning-oriented investigation with more autonomy; avoid for destructive or persistence work.",
+    "read-only audit": "No writes allowed; worker inventories source files, classifies findings, and recommends bounded follow-up tickets."
   },
   "promptAdaptationRules": [
     "Record promptStyle, taskType, promptStrictness, contextProvided, allowedWriteScopeStyle, evaluationMeaning, and promptAdaptationNotes for new evaluations.",
     "Use strict bounded tickets for implementation work by cheap/open-weight workers until a model proves broader autonomous planning.",
     "For compatibility aliases, require preferred-only, legacy-only, and both-present behavior to be specified and tested or guarded.",
-    "For persistence-adjacent work, require raw boundary-shape tests and validate-before-wipe behavior, or keep the worker draft-only."
+    "For persistence-adjacent work, require raw boundary-shape tests and validate-before-wipe behavior, or keep the worker draft-only.",
+    "For read-only label audits, include placeholders, conditional labels, empty states, subtitles, and error text in the required search target list."
   ]
 }
 </script>

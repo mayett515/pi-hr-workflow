@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pi Agent Prompt Builder</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #0a0c14;
+      --bg-2: #0f1219;
+      --panel: #13161f;
+      --panel-2: #1a1e2b;
+      --panel-3: #222738;
+      --text: #e8ecf4;
+      --text-2: #c1c8d8;
+      --muted: #6b7590;
+      --border: #1f2537;
+      --border-2: #2a3048;
+      --accent: #6c8cff;
+      --accent-2: #4f6fd8;
+      --accent-glow: rgba(108, 140, 255, 0.15);
+      --accent-glow-2: rgba(108, 140, 255, 0.08);
+      --good: #4ade80;
+      --good-bg: rgba(74, 222, 128, 0.1);
+      --warn: #fbbf24;
+      --warn-bg: rgba(251, 191, 36, 0.1);
+      --danger: #f87171;
+      --danger-bg: rgba(248, 113, 113, 0.1);
+      --code-bg: #0c0e17;
+      --tag-mitsupi: #a78bfa;
+      --tag-pihooks: #60a5fa;
+      --tag-core: #f0abfc;
+      --ai-gradient: linear-gradient(135deg, #6c8cff, #a78bfa, #f0abfc);
+      --orb-1: rgba(108,140,255,.3);
+      --orb-2: rgba(167,139,250,.25);
+      --header-bg: rgba(10, 12, 20, 0.7);
+      --title-gradient: linear-gradient(135deg, #e8ecf4, #6c8cff);
+    }
+
+    body[data-theme="sepia"] {
+      --bg: #16120d;
+      --bg-2: #1c1812;
+      --panel: #1f1a13;
+      --panel-2: #2a231a;
+      --panel-3: #342c1f;
+      --text: #ede4d4;
+      --text-2: #c9bda8;
+      --muted: #8a7e6b;
+      --border: #2e261c;
+      --border-2: #3d3426;
+      --accent: #d4a053;
+      --accent-2: #b8883a;
+      --accent-glow: rgba(212, 160, 83, 0.15);
+      --accent-glow-2: rgba(212, 160, 83, 0.08);
+      --good: #8fc98a;
+      --good-bg: rgba(143, 201, 138, 0.1);
+      --warn: #d4a053;
+      --warn-bg: rgba(212, 160, 83, 0.1);
+      --danger: #d47a6a;
+      --danger-bg: rgba(212, 122, 106, 0.1);
+      --code-bg: #110e0a;
+      --tag-mitsupi: #d4a053;
+      --tag-pihooks: #7ab8d4;
+      --tag-core: #d4a0d4;
+      --ai-gradient: linear-gradient(135deg, #d4a053, #e8c87a, #d4a0d4);
+      --orb-1: rgba(212,160,83,.25);
+      --orb-2: rgba(180,130,60,.2);
+      --header-bg: rgba(22, 18, 13, 0.82);
+      --title-gradient: linear-gradient(135deg, #ede4d4, #d4a053);
+    }
+
+    body[data-theme="paper"] {
+      --bg: #f5f2ed;
+      --bg-2: #ece8e1;
+      --panel: #ffffff;
+      --panel-2: #f7f4ef;
+      --panel-3: #ece8e1;
+      --text: #1a1814;
+      --text-2: #4a453d;
+      --muted: #8a8078;
+      --border: #ddd6cb;
+      --border-2: #c9c0b3;
+      --accent: #6c5ce7;
+      --accent-2: #5a4bd6;
+      --accent-glow: rgba(108, 92, 231, 0.12);
+      --accent-glow-2: rgba(108, 92, 231, 0.06);
+      --good: #2d9c4f;
+      --good-bg: rgba(45, 156, 79, 0.08);
+      --warn: #c77d10;
+      --warn-bg: rgba(199, 125, 16, 0.08);
+      --danger: #c93535;
+      --danger-bg: rgba(201, 53, 53, 0.08);
+      --code-bg: #eae5dd;
+      --tag-mitsupi: #7c5ce7;
+      --tag-pihooks: #2d8cc9;
+      --tag-core: #a855f7;
+      --ai-gradient: linear-gradient(135deg, #6c5ce7, #a855f7, #ec4899);
+      --orb-1: rgba(108,92,231,.12);
+      --orb-2: rgba(168,85,247,.1);
+      --header-bg: rgba(245, 242, 237, 0.88);
+      --title-gradient: linear-gradient(135deg, #1a1814, #6c5ce7);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.4s ease, color 0.3s ease;
+    }
+
+    .bg-orbs {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .bg-orbs::before, .bg-orbs::after {
+      content: ''; position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.35;
+      animation: orbFloat 20s ease-in-out infinite alternate;
+    }
+    .bg-orbs::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--orb-1), transparent 70%);
+      top: -10%; left: -5%;
+    }
+    .bg-orbs::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--orb-2), transparent 70%);
+      bottom: -10%; right: -5%; animation-delay: -10s;
+    }
+    @keyframes orbFloat {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, -30px) scale(1.08); }
+    }
+
+    #app { position: relative; z-index: 1; }
+
+    header {
+      padding: 28px 40px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--header-bg);
+      backdrop-filter: blur(20px);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-inner {
+      max-width: 1440px; margin: 0 auto;
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .header-left h1 {
+      font-size: 26px; font-weight: 800; letter-spacing: -0.03em;
+      background: var(--title-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1.2;
+    }
+    .header-left p {
+      color: var(--muted); font-size: 13px; margin-top: 5px;
+      max-width: 560px; line-height: 1.5;
+    }
+    .header-right {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    }
+    .theme-switcher {
+      display: flex; gap: 4px; background: var(--panel-2);
+      border: 1px solid var(--border-2); border-radius: 10px; padding: 4px;
+    }
+    .theme-btn {
+      width: 32px; height: 32px; border: 2px solid transparent;
+      border-radius: 8px; cursor: pointer; font-size: 15px;
+      background: transparent; color: var(--muted); transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .theme-btn:hover { background: var(--panel-3); color: var(--text); }
+    .theme-btn.active {
+      border-color: var(--accent); background: var(--accent-glow);
+      color: var(--text); box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .stat-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--panel-2); border: 1px solid var(--border-2);
+      border-radius: 100px; padding: 5px 12px; font-size: 12px; color: var(--text-2);
+    }
+    .stat-chip .num { font-weight: 700; color: var(--accent); font-size: 14px; }
+
+    .app-layout {
+      display: grid; grid-template-columns: 340px 1fr;
+      gap: 0; min-height: calc(100vh - 90px);
+    }
+    .sidebar {
+      border-right: 1px solid var(--border); background: var(--bg-2);
+      overflow-y: auto; height: calc(100vh - 90px); position: sticky; top: 90px;
+    }
+    .sidebar-section {
+      padding: 16px 14px 12px; border-bottom: 1px solid var(--border);
+    }
+    .sidebar-section-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--muted); margin-bottom: 10px; padding: 0 4px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar-section-title button {
+      background: none; border: none; color: var(--accent); cursor: pointer;
+      font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px;
+    }
+    .sidebar-section-title button:hover { background: var(--accent-glow-2); }
+
+    .block-btn {
+      width: 100%; text-align: left; background: transparent;
+      border: 1px solid transparent; border-radius: 10px;
+      padding: 10px 12px; cursor: pointer; color: var(--text);
+      margin-bottom: 3px; transition: all 0.15s ease; position: relative; overflow: hidden;
+    }
+    .block-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--accent-glow-2), transparent);
+      opacity: 0; transition: opacity 0.15s; border-radius: 10px;
+    }
+    .block-btn:hover { border-color: var(--border-2); }
+    .block-btn:hover::before { opacity: 1; }
+    .block-btn.active {
+      background: var(--panel-3); border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow), inset 0 0 20px var(--accent-glow-2);
+    }
+    .block-btn.active::before { opacity: 1; }
+    .block-btn-inner { position: relative; z-index: 1; }
+    .block-btn-top {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .block-btn-title { font-weight: 600; font-size: 13px; }
+    .block-btn-tags { display: flex; gap: 4px; }
+    .mini-tag {
+      font-size: 9px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; padding: 2px 5px; border-radius: 4px; line-height: 1.3;
+    }
+    .mini-tag.mitsupi { background: rgba(167,139,250,.15); color: var(--tag-mitsupi); }
+    .mini-tag.pi-hooks { background: rgba(96,165,250,.15); color: var(--tag-pihooks); }
+    .mini-tag.core { background: rgba(240,171,252,.12); color: var(--tag-core); }
+    .mini-tag.verification { background: rgba(74,222,128,.12); color: var(--good); }
+    .mini-tag.git { background: rgba(251,191,36,.12); color: var(--warn); }
+    .mini-tag.search { background: rgba(248,113,113,.12); color: var(--danger); }
+    .mini-tag.autonomy { background: rgba(108,140,255,.15); color: var(--accent); }
+    .mini-tag.quality { background: rgba(74,222,128,.12); color: var(--good); }
+    .mini-tag.todo { background: rgba(167,139,250,.15); color: var(--tag-mitsupi); }
+    .mini-tag.safety { background: rgba(248,113,113,.12); color: var(--danger); }
+    .block-btn-summary {
+      font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4;
+    }
+
+    .toggle-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 12px; border-radius: 10px; margin-bottom: 3px;
+      transition: background 0.15s; cursor: pointer;
+    }
+    .toggle-item:hover { background: var(--panel-3); }
+    .toggle-item.disabled { opacity: 0.45; }
+    .toggle-switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0; background: var(--panel-3);
+      border: 1px solid var(--border-2); border-radius: 10px;
+      transition: all 0.25s; cursor: pointer;
+    }
+    .toggle-track::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px; border-radius: 50%; background: var(--muted);
+      transition: all 0.25s cubic-bezier(0.68, -0.15, 0.265, 1.35);
+    }
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .toggle-switch input:checked + .toggle-track::after {
+      transform: translateX(16px); background: #fff;
+    }
+    .toggle-label { padding-top: 0; }
+    .toggle-label-title { font-size: 13px; font-weight: 600; }
+    .toggle-label-desc { font-size: 11px; color: var(--muted); margin-top: 1px; line-height: 1.35; }
+
+    .main-area {
+      overflow-y: auto; height: calc(100vh - 90px); padding: 20px 28px 48px;
+    }
+
+    .detail-card {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 18px;
+      overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.25);
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .detail-header {
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--panel-2), var(--panel));
+    }
+    .detail-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .detail-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+      background: linear-gradient(135deg, var(--accent-glow), var(--accent-glow-2));
+      border: 1px solid rgba(108,140,255,0.25); flex-shrink: 0;
+    }
+    .detail-title { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+    .detail-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .detail-badge {
+      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 100px;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .detail-badge.required { background: rgba(74,222,128,.12); color: var(--good); border: 1px solid rgba(74,222,128,.25); }
+    .detail-badge.recommended { background: rgba(108,140,255,.12); color: var(--accent); border: 1px solid rgba(108,140,255,.25); }
+    .detail-badge.optional { background: rgba(251,191,36,.12); color: var(--warn); border: 1px solid rgba(251,191,36,.25); }
+    .detail-body { padding: 16px 24px; color: var(--text-2); font-size: 13px; line-height: 1.6; }
+
+    .detail-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 24px 20px;
+    }
+    .detail-sub {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .detail-sub-header {
+      padding: 8px 14px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: rgba(15,18,25,0.6);
+    }
+    .detail-sub pre {
+      padding: 12px 14px; font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+      font-size: 12px; line-height: 1.55; color: #c9d1e0;
+      white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow-y: auto;
+    }
+    .xml-tag { color: var(--accent); }
+
+    .prompt-card {
+      margin-top: 16px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.25);
+    }
+    .prompt-toolbar {
+      padding: 12px 18px; display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid var(--border); background: linear-gradient(135deg, var(--panel-2), var(--panel));
+      flex-wrap: wrap;
+    }
+    .prompt-toolbar-title {
+      font-weight: 700; font-size: 14px; margin-right: auto;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .prompt-toolbar-title .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--good);
+      box-shadow: 0 0 8px rgba(74,222,128,.5);
+    }
+    .toolbar-btn {
+      background: var(--panel-3); border: 1px solid var(--border-2);
+      color: var(--text-2); border-radius: 8px; padding: 7px 14px;
+      font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+      font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 5px;
+    }
+    .toolbar-btn:hover {
+      border-color: var(--accent); background: rgba(108,140,255,.08);
+      color: var(--text); transform: translateY(-1px);
+    }
+    .toolbar-btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-color: transparent; color: #fff;
+    }
+    .toolbar-btn.primary:hover { box-shadow: 0 4px 20px var(--accent-glow); }
+    .toolbar-btn.ai-btn {
+      background: var(--ai-gradient); border-color: transparent; color: #fff;
+      position: relative; overflow: hidden;
+    }
+    .toolbar-btn.ai-btn:hover { box-shadow: 0 4px 24px rgba(108,140,255,.35); }
+    .toolbar-btn.ai-btn.loading { opacity: 0.7; pointer-events: none; }
+    .toolbar-btn .spinner {
+      width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .prompt-textarea {
+      width: 100%; min-height: 420px; resize: vertical;
+      border: 0; outline: 0; background: var(--code-bg);
+      color: #e0e6f0; font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+      font-size: 13px; line-height: 1.6; padding: 18px; tab-size: 2;
+    }
+    .prompt-footer {
+      padding: 12px 18px; border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 11px; line-height: 1.5; background: var(--bg-2);
+    }
+
+    .schema-lesson {
+      margin: 12px 24px 16px; padding: 14px 18px;
+      background: linear-gradient(135deg, rgba(108,140,255,.06), rgba(167,139,250,.04));
+      border: 1px solid rgba(108,140,255,.18); border-radius: 12px;
+      font-size: 12px; color: var(--text-2); line-height: 1.55;
+    }
+    .schema-lesson strong { color: var(--accent); }
+    .schema-lesson .tag-ex {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      background: var(--code-bg); border-radius: 5px; padding: 1px 5px; color: var(--accent);
+    }
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 32px; text-align: center;
+    }
+    .empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.5; }
+    .empty-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .empty-desc { color: var(--muted); font-size: 13px; max-width: 340px; line-height: 1.5; }
+
+    .copied-toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--good); color: #000; padding: 9px 22px;
+      border-radius: 10px; font-weight: 700; font-size: 13px; z-index: 9999;
+      pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+      opacity: 0; box-shadow: 0 8px 32px rgba(74,222,128,.3);
+    }
+    .copied-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    .ai-settings {
+      background: var(--panel-2); border-top: 1px solid var(--border);
+      overflow: hidden; transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+    .ai-settings.collapsed { max-height: 0; padding: 0 14px; }
+    .ai-settings.expanded { max-height: 600px; padding: 14px; }
+    .ai-settings-inner { display: grid; gap: 10px; }
+    .ai-field {}
+    .ai-field label {
+      display: block; font-size: 11px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px;
+    }
+    .ai-field input, .ai-field select {
+      width: 100%; background: var(--code-bg); border: 1px solid var(--border-2);
+      border-radius: 8px; padding: 8px 12px; color: var(--text);
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .ai-field input:focus, .ai-field select:focus { border-color: var(--accent); }
+    .ai-field select { cursor: pointer; }
+    .ai-field .hint { font-size: 10px; color: var(--muted); margin-top: 3px; }
+    .ai-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .ai-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .ai-modal {
+      background: var(--panel); border: 1px solid var(--border-2);
+      border-radius: 20px; width: 90%; max-width: 960px;
+      max-height: 85vh; display: flex; flex-direction: column;
+      box-shadow: 0 32px 80px rgba(0,0,0,.5);
+      animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalSlide { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .ai-modal-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, var(--panel-2), var(--panel));
+    }
+    .ai-modal-title {
+      font-size: 18px; font-weight: 800;
+      background: var(--ai-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .ai-modal-actions { display: flex; gap: 8px; }
+    .ai-modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+    .ai-diff {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .ai-diff-panel {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+    }
+    .ai-diff-label {
+      padding: 8px 14px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: rgba(15,18,25,0.6);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ai-diff-label .count { color: var(--accent); }
+    .ai-diff pre {
+      padding: 14px; font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px; line-height: 1.55; color: #c9d1e0;
+      white-space: pre-wrap; word-break: break-word; flex: 1;
+      overflow-y: auto; max-height: 55vh;
+    }
+    .ai-diff pre .line-add { background: rgba(74,222,128,.1); }
+    .ai-diff pre .line-del { background: rgba(248,113,113,.1); }
+    .ai-streaming {
+      color: var(--text-2); font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; line-height: 1.6; white-space: pre-wrap;
+      padding: 14px; max-height: 55vh; overflow-y: auto;
+    }
+    .ai-streaming .cursor {
+      display: inline-block; width: 2px; height: 14px;
+      background: var(--accent); animation: blink 0.8s step-end infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .ai-error {
+      padding: 16px; background: var(--danger-bg);
+      border: 1px solid rgba(248,113,113,.25); border-radius: 12px;
+      color: var(--danger); font-size: 13px; line-height: 1.6;
+    }
+    .ai-error h3 { margin-bottom: 8px; font-size: 15px; }
+    .ai-error code {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      background: rgba(0,0,0,.3); padding: 2px 6px; border-radius: 4px;
+    }
+    .ai-loading {
+      display: flex; align-items: center; gap: 14px;
+      padding: 32px; color: var(--text-2); justify-content: center;
+    }
+    .ai-loading .bigspinner {
+      width: 28px; height: 28px; border: 3px solid var(--border-2);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .ai-result-actions {
+      padding: 16px 24px; border-top: 1px solid var(--border);
+      display: flex; gap: 10px; justify-content: flex-end;
+      background: linear-gradient(135deg, var(--panel-2), var(--panel));
+    }
+    .result-btn {
+      padding: 10px 20px; border-radius: 10px; font-size: 13px;
+      font-weight: 600; cursor: pointer; transition: all 0.15s;
+      font-family: 'Inter', sans-serif; border: 1px solid var(--border-2);
+    }
+    .result-btn.secondary {
+      background: var(--panel-3); color: var(--text-2);
+    }
+    .result-btn.secondary:hover { border-color: var(--accent); color: var(--text); }
+    .result-btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff; border-color: transparent;
+    }
+    .result-btn.primary:hover { box-shadow: 0 4px 16px var(--accent-glow); }
+    .result-btn.ai {
+      background: var(--ai-gradient); color: #fff; border-color: transparent;
+    }
+    .result-btn.ai:hover { box-shadow: 0 4px 20px rgba(167,139,250,.35); }
+
+    @media (max-width: 1024px) {
+      .app-layout { grid-template-columns: 1fr; }
+      .sidebar { height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); }
+      .main-area { height: auto; }
+      header { position: static; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .ai-diff { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      header { padding: 16px; }
+      .main-area { padding: 14px; }
+    }
+
+    .sidebar::-webkit-scrollbar { width: 5px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 10px; }
+    .prompt-textarea::-webkit-scrollbar { width: 8px; }
+    .prompt-textarea::-webkit-scrollbar-track { background: var(--code-bg); }
+    .prompt-textarea::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs"></div>
+
+  <div id="app">
+    <header>
+      <div class="header-inner">
+        <div class="header-left">
+          <h1>Pi Agent Prompt Builder</h1>
+          <p>Toggle your tools, click a block to learn it, then copy the generated prompt &mdash; or let AI refine it for you.</p>
+        </div>
+        <div class="header-right">
+          <div class="theme-switcher">
+            <button
+              v-for="t in themes" :key="t.id"
+              class="theme-btn"
+              :class="{ active: theme === t.id }"
+              @click="setTheme(t.id)"
+              :title="t.name"
+            >{{ t.icon }}</button>
+          </div>
+          <div class="stat-chip"><span class="num">{{ activeSections }}</span><span>on</span></div>
+          <div class="stat-chip"><span class="num">{{ promptWords }}</span><span>words</span></div>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-layout">
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Prompt Blocks</div>
+          <button
+            v-for="s in sections" :key="s.id"
+            class="block-btn" :class="{ active: selected === s.id }"
+            @click="selected = s.id"
+          >
+            <div class="block-btn-inner">
+              <div class="block-btn-top">
+                <span class="block-btn-title">{{ s.icon }} {{ s.title }}</span>
+                <div class="block-btn-tags">
+                  <span v-for="t in s.tags" :key="t" class="mini-tag" :class="t">{{ t }}</span>
+                </div>
+              </div>
+              <div class="block-btn-summary">{{ s.summary }}</div>
+            </div>
+          </button>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Installed Tools</div>
+          <label v-for="tool in tools" :key="tool.feature" class="toggle-item" :class="{ disabled: !tool.on }">
+            <div class="toggle-switch">
+              <input type="checkbox" v-model="tool.on" />
+              <div class="toggle-track"></div>
+            </div>
+            <div class="toggle-label">
+              <div class="toggle-label-title">{{ tool.name }}</div>
+              <div class="toggle-label-desc">{{ tool.desc }}</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="sidebar-section" style="border-bottom:none">
+          <div class="sidebar-section-title">
+            AI Settings
+            <button @click="showAiSettings = !showAiSettings">{{ showAiSettings ? 'Hide' : 'Edit' }}</button>
+          </div>
+          <div class="ai-settings" :class="showAiSettings ? 'expanded' : 'collapsed'">
+            <div class="ai-settings-inner">
+              <div class="ai-field">
+                <label>Provider</label>
+                <select v-model="ai.provider">
+                  <option value="openai">OpenAI / Compatible</option>
+                  <option value="openrouter">OpenRouter</option>
+                  <option value="opencode">OpenCode</option>
+                  <option value="ollama">Ollama (local)</option>
+                  <option value="claude">Claude (Anthropic)</option>
+                </select>
+              </div>
+              <div class="ai-row">
+                <div class="ai-field">
+<label>API Key</label>
+                <input type="password" v-model="ai.apiKey" :placeholder="apiKeyPlaceholder" />
+                  <div class="hint">Stored in browser only &mdash; never sent anywhere else</div>
+                </div>
+                <div class="ai-field">
+                  <label>Model</label>
+                  <input type="text" v-model="ai.model" />
+                </div>
+              </div>
+              <div class="ai-field">
+                <label>Base URL <span style="color:var(--muted);font-weight:400;text-transform:none">(leave default unless custom)</span></label>
+                <input type="text" v-model="ai.baseUrl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="main-area">
+        <div v-if="current" :key="current.id" class="detail-card">
+          <div class="detail-header">
+            <div class="detail-title-row">
+              <div class="detail-icon">{{ current.icon }}</div>
+              <div class="detail-title">{{ current.title }}</div>
+            </div>
+            <div class="detail-badges">
+              <span class="detail-badge" :class="current.level">{{ current.level }}</span>
+              <span v-for="t in current.tags" :key="t" class="detail-badge" :class="t">{{ t }}</span>
+            </div>
+          </div>
+          <div class="detail-body">{{ current.body }}</div>
+          <div class="schema-lesson" v-if="current.id === 'identity'">
+            <strong>Design principle:</strong> Markdown is for structure (headings, lists, readability). XML tags are for <em>hard behavioral boundaries</em>. Use <span class="tag-ex">&lt;tag_name&gt;</span> when the model must treat the content as a strict instruction block, not just text.
+          </div>
+          <div class="detail-grid">
+            <div class="detail-sub">
+              <div class="detail-sub-header">XML prompt block</div>
+              <pre>{{ current.example }}</pre>
+            </div>
+            <div class="detail-sub">
+              <div class="detail-sub-header">When to use</div>
+              <pre>{{ current.use }}</pre>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="empty-state">
+          <div class="empty-icon">&#9889;</div>
+          <div class="empty-title">Pick a prompt block</div>
+          <div class="empty-desc">Select a block on the left to see what it does, why it matters, and the XML it adds.</div>
+        </div>
+
+        <div class="prompt-card">
+          <div class="prompt-toolbar">
+            <div class="prompt-toolbar-title"><span class="dot"></span> Generated Prompt</div>
+            <button class="toolbar-btn ai-btn" :class="{ loading: aiBusy }" @click="aiEnhance" :disabled="aiBusy">
+              <template v-if="aiBusy"><div class="spinner"></div> Generating...</template>
+              <template v-else>&#10024; AI Enhance</template>
+            </button>
+            <button class="toolbar-btn primary" @click="copyPrompt">&#128203; Copy</button>
+            <button class="toolbar-btn" @click="downloadPrompt">&#11015;&#65039; .md</button>
+            <button class="toolbar-btn" @click="resetAll">&#8635; Reset</button>
+          </div>
+          <textarea class="prompt-textarea" spellcheck="false" v-model="editablePrompt"></textarea>
+          <div class="prompt-footer">
+            Reality check: the prompt tells Pi <em>when</em> to use tools, in what <em>order</em>, and when to <em>ask you</em>.
+            &middot; {{ promptWords }} words &middot; {{ promptLines }} lines
+            <span v-if="isDirty" style="color:var(--warn);margin-left:8px">&#9888; edited manually &mdash; <a href="#" @click.prevent="resyncFromTemplate" style="color:var(--accent)">re-sync from template</a></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showAiModal" class="ai-overlay" @click.self="showAiModal = false">
+      <div class="ai-modal">
+        <div class="ai-modal-header">
+          <div class="ai-modal-title">&#10024; AI-Enhanced Prompt</div>
+          <div class="ai-modal-actions">
+            <button class="result-btn secondary" @click="showAiModal = false">Close</button>
+          </div>
+        </div>
+        <div class="ai-modal-body">
+          <div v-if="aiError" class="ai-error">
+            <h3>&#9888; Generation failed</h3>
+            <p>{{ aiError }}</p>
+            <p style="margin-top:8px" v-if="aiError.includes('CORS') || aiError.includes('Network')">
+              <strong>Tip:</strong> Try Ollama (local, no CORS) or an OpenAI-compatible proxy that allows browser requests.
+            </p>
+          </div>
+          <div v-else-if="aiBusy && !aiResult" class="ai-loading">
+            <div class="bigspinner"></div>
+            <span>AI is refining your prompt{{ aiStreamText ? '...' : '' }}</span>
+          </div>
+          <div v-if="aiStreamText && !aiResult" class="ai-streaming">{{ aiStreamText }}<span class="cursor"></span></div>
+          <div v-if="aiResult" class="ai-diff">
+            <div class="ai-diff-panel">
+              <div class="ai-diff-label">Template <span class="count">{{ templateLines }} lines</span></div>
+              <pre>{{ templatePrompt }}</pre>
+            </div>
+            <div class="ai-diff-panel">
+              <div class="ai-diff-label">AI-Enhanced <span class="count">{{ aiResultLines }} lines</span></div>
+              <pre>{{ aiResult }}</pre>
+            </div>
+          </div>
+        </div>
+        <div v-if="aiResult" class="ai-result-actions">
+          <button class="result-btn secondary" @click="showAiModal = false">Keep template</button>
+          <button class="result-btn primary" @click="copyResult">&#128203; Copy AI version</button>
+          <button class="result-btn ai" @click="applyResult">&#10024; Use AI version</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="copied-toast" :class="{ show: toastVisible }">&#10003; Copied to clipboard</div>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, watch, nextTick } = Vue;
+
+    const HARNESS_PROMPT = `You are an expert prompt engineer specializing in system prompts for local coding agents.
+
+The user has built a system prompt using a template builder for their Pi coding agent. Pi is a local terminal-based coding agent on Windows with the following installed tools:
+- mitsupi: todos, review, commit, files
+- pi-hooks: permissions, checkpoints, LSP diagnostics
+- web search
+
+The user has selected specific blocks and toggled specific tools. Here is the current raw prompt they generated:
+
+<prompt_to_refine>
+{PROMPT}
+</prompt_to_refine>
+
+The user has these tools ENABLED:
+{TOOLS}
+
+Your task: Refine and strengthen this system prompt. You may:
+1. Tighten language and remove redundancy
+2. Add missing important instructions or edge cases Pi agents commonly need
+3. Improve the XML tag boundaries and make them more precise
+4. Reorder sections for better model comprehension (identity first, then tools, then behavioral blocks, then loop, then response format)
+5. Add a <memory_policy> section for reading project memory files (PROJECT.md, AGENTS.md, commands.md, decisions.md, README.md)
+6. Strengthen behavioral constraints where local coding agents tend to fail (e.g., hallucinating tool runs, jumping to conclusions without inspecting, mixing unrelated commits)
+
+Rules:
+- Keep all Markdown headings and XML tags
+- Keep the same general structure
+- Do NOT add capabilities the user didn't enable in their toggles
+- Do NOT remove core sections like identity, permission policy, or final response format
+- Return ONLY the refined prompt text in Markdown, no explanation, no preamble, no markdown code fences
+- Use Markdown for structure and XML tags for hard behavioral boundaries`;
+
+    createApp({
+      setup() {
+        const sections = [
+          {
+            id: 'identity', title: 'Agent Identity', icon: '\u{1F916}',
+            tags: ['core'], level: 'required',
+            summary: 'Defines Pi as a disciplined coding agent, not a chatbot.',
+            body: 'This tells the model what role it is playing. Keep it short and operational. The important part is that the agent must work through tools, repo state, todos, tests, and review instead of just answering casually.',
+            example: `<agent_identity>\nYou are a local Pi coding agent. Your job is to improve the current repository safely, incrementally, and verifiably.\nYou are not just a chatbot: use the installed tools when they are relevant.\n</agent_identity>`,
+            use: 'Use this at the top of every system or project prompt. It frames all later rules and gives the model a role to inhabit.',
+            feature: null
+          },
+          {
+            id: 'todos', title: 'Todos / Task State', icon: '\u{1F4CB}',
+            tags: ['mitsupi', 'todo'], level: 'required',
+            summary: 'Forces the agent to read, create, and update persistent todos.',
+            body: 'This is the brainstem. Installed todos do not help if the prompt never tells the model to use them. This block makes tasks persistent and gives the agent a resume point after restarts.',
+            example: `<todo_protocol>\n- At the start of coding work, inspect the current todos.\n- If the user gives a vague goal, create concrete todos before editing.\n- Keep exactly one todo marked active when working.\n- Update todos when blocked, completed, or when scope changes.\n- Do not silently ignore the todo system.\n</todo_protocol>`,
+            use: 'Use for any multi-step coding task, debugging session, refactor, or feature build.',
+            feature: 'todos'
+          },
+          {
+            id: 'permissions', title: 'Permissions / Safety', icon: '\u{1F6E1}\uFE0F',
+            tags: ['pi-hooks', 'safety'], level: 'required',
+            summary: 'Prevents destructive or unsafe shell behavior.',
+            body: 'Pi-hooks can enforce permissions, but the model still needs behavioral rules. This block tells it to ask before destructive commands, secret access, global installs, deleting files, or changing system configuration.',
+            example: `<permission_policy>\n- Read-only inspection is allowed.\n- Ask before deleting, overwriting, installing globally, changing env files, or running destructive commands.\n- Never print secrets, tokens, or API keys.\n- Prefer minimal local changes over system-wide changes.\n</permission_policy>`,
+            use: 'Use always. Especially important on Windows where npm/global folders and profile paths are easy to mess up.',
+            feature: 'permissions'
+          },
+          {
+            id: 'checkpoint', title: 'Checkpoints / Rollback', icon: '\u{1F504}',
+            tags: ['pi-hooks', 'git'], level: 'recommended',
+            summary: 'Creates restore points before risky work.',
+            body: 'This makes the agent pause before big edits and preserve a rollback point. It is ideal before refactors, dependency changes, config edits, or touching many files at once.',
+            example: `<checkpoint_policy>\nBefore risky edits, create a checkpoint. Risky edits include:\n- multi-file refactors\n- dependency updates\n- config changes\n- generated rewrites\n- deleting or moving files\nIf tests fail badly or the user rejects the direction, offer to restore the checkpoint.\n</checkpoint_policy>`,
+            use: 'Use for medium or high-risk changes. Not critical for tiny one-line edits.',
+            feature: 'checkpoint'
+          },
+          {
+            id: 'lsp', title: 'LSP / Diagnostics', icon: '\u{1F9EC}',
+            tags: ['pi-hooks', 'quality'], level: 'recommended',
+            summary: 'Makes the agent check language errors instead of guessing.',
+            body: 'If LSP diagnostics are available, the agent should read them before and after edits. This catches TypeScript, Python, import, type, and symbol errors earlier than test runs.',
+            example: `<diagnostics_protocol>\n- Before editing, inspect relevant diagnostics if available.\n- After editing, check diagnostics again.\n- Do not declare success while new errors remain unless clearly unrelated.\n- Treat new type, import, or lint errors as regressions.\n</diagnostics_protocol>`,
+            use: 'Use for TypeScript, Python, React, config-heavy repos, and anything with imports or types.',
+            feature: 'lsp'
+          },
+          {
+            id: 'tests', title: 'Test / Verify Loop', icon: '\u{2705}',
+            tags: ['verification'], level: 'required',
+            summary: 'Turns Pi from an editor into an actual coding agent.',
+            body: 'The agent should not stop after changing files. It should run the known test/lint/build command, read failures, fix them, and repeat until the task is done or it is blocked.',
+            example: `<verification_loop>\nAfter code changes:\n1. Run the smallest relevant check first.\n2. If that passes, run the broader test/lint/build command.\n3. If a check fails, read the error, fix the cause, and repeat.\n4. Stop only when verified, blocked, unsafe, or needing user permission.\n</verification_loop>`,
+            use: 'Use for every coding task. Define your project commands in PROJECT.md or commands.md.',
+            feature: null
+          },
+          {
+            id: 'review', title: 'Review Pass', icon: '\u{1F50D}',
+            tags: ['mitsupi', 'quality'], level: 'recommended',
+            summary: 'Adds a second pass over the diff before the final answer.',
+            body: 'Mitsupi review is useful when the agent changed code. This block makes it inspect the diff, look for regressions, and clean up before claiming the work is done.',
+            example: `<review_protocol>\nBefore final response after edits:\n- Review the diff.\n- Remove unnecessary changes.\n- Check for regressions.\n- Check whether tests or docs need updating.\n- Summarize what was verified.\n</review_protocol>`,
+            use: 'Use after edits, especially before commits or larger refactors.',
+            feature: 'review'
+          },
+          {
+            id: 'commit', title: 'Commit Workflow', icon: '\u{1F500}',
+            tags: ['mitsupi', 'git'], level: 'recommended',
+            summary: 'Keeps git clean and understandable.',
+            body: 'This does not mean auto-commit everything. It tells the agent to inspect git state, separate unrelated changes, and only commit when the user asked or the task is complete.',
+            example: `<git_protocol>\n- Inspect git status before editing.\n- Do not mix unrelated changes.\n- Commit only when asked or when the workflow explicitly says to.\n- Write a clear commit message explaining the change and what was verified.\n</git_protocol>`,
+            use: 'Use for real repo work. Disable auto-commit behavior if you prefer manual control.',
+            feature: 'commit'
+          },
+          {
+            id: 'web', title: 'Web Search / Docs', icon: '\u{1F310}',
+            tags: ['search'], level: 'recommended',
+            summary: 'Tells the agent when to use installed web search.',
+            body: 'A web search tool is only useful if the agent knows when to use it: new APIs, unknown errors, recent package behavior, docs, and version-specific issues.',
+            example: `<research_policy>\nUse web search when:\n- package or API behavior may have changed\n- an error message is unfamiliar\n- installation instructions are needed\n- docs, changelogs, or GitHub issues would help\n- the answer depends on current information\n\nPrefer official docs, package READMEs, GitHub repos, GitHub issues, and changelogs.\n</research_policy>`,
+            use: 'Use for dependency errors, install commands, package APIs, current docs, or obscure runtime messages.',
+            feature: 'web'
+          },
+          {
+            id: 'loop', title: 'Agent Loop', icon: '\u{1F504}',
+            tags: ['mitsupi', 'autonomy'], level: 'required',
+            summary: 'Makes the agent keep going until done, blocked, or unsafe.',
+            body: 'This is what makes Pi feel more like Claude Code. The agent should plan, act, verify, review, update todo state, then continue. It should stop only when the task is done, it is blocked, or it needs permission.',
+            example: `<agent_loop>\nFor coding tasks, repeat this loop:\nread todos \u2192 inspect repo \u2192 plan \u2192 checkpoint if risky \u2192 edit \u2192 diagnostics \u2192 tests \u2192 review \u2192 update todos \u2192 summarize\n\nStop only when:\n- the task is done\n- you are blocked\n- you need permission\n- the action is unsafe\n</agent_loop>`,
+            use: 'Use for larger tasks where you want the model to continue instead of asking after every tiny step.',
+            feature: 'loop'
+          }
+        ];
+
+        const selected = ref('identity');
+        const editablePrompt = ref('');
+        const isDirty = ref(false);
+        const showAiSettings = ref(false);
+        const showAiModal = ref(false);
+        const aiBusy = ref(false);
+        const aiResult = ref('');
+        const aiStreamText = ref('');
+        const aiError = ref('');
+        const toastVisible = ref(false);
+
+        const themes = [
+          { id: 'midnight', name: 'Midnight', icon: '\u{1F319}' },
+          { id: 'sepia', name: 'Warm Sepia', icon: '\u{1F309}' },
+          { id: 'paper', name: 'Paper', icon: '\u{1F4C4}' }
+        ];
+        const theme = ref(localStorage.getItem('pi-prompt-theme') || 'midnight');
+
+        function setTheme(id) {
+          theme.value = id;
+          document.body.setAttribute('data-theme', id);
+          localStorage.setItem('pi-prompt-theme', id);
+        }
+
+        setTheme(theme.value);
+
+        const ai = ref({
+          provider: 'openai',
+          apiKey: '',
+          model: 'gpt-4o',
+          baseUrl: ''
+        });
+
+        const tools = ref([
+          { feature: 'todos', name: 'Mitsupi todos', desc: 'Persistent task planning and session continuity.', on: true },
+          { feature: 'permissions', name: 'Pi-hooks permissions', desc: 'Gate destructive shell and file operations.', on: true },
+          { feature: 'checkpoint', name: 'Pi-hooks checkpoints', desc: 'Create restore points before risky edits.', on: true },
+          { feature: 'lsp', name: 'Pi-hooks LSP diagnostics', desc: 'Use language errors and symbols instead of guessing.', on: true },
+          { feature: 'review', name: 'Mitsupi review', desc: 'Second-pass diff review before final answer.', on: true },
+          { feature: 'commit', name: 'Mitsupi commit', desc: 'Clean commit messages after verified work.', on: true },
+          { feature: 'web', name: 'Web search', desc: 'Research current docs, errors, packages, APIs.', on: true },
+          { feature: 'loop', name: 'Loop workflow', desc: 'Keep iterating until tests pass or blocked.', on: true }
+        ]);
+
+        const current = computed(() => sections.find(s => s.id === selected.value));
+
+        const enabledFeatures = computed(() => new Set(tools.value.filter(t => t.on).map(t => t.feature)));
+
+        const activeSections = computed(() =>
+          sections.filter(s => !s.feature || enabledFeatures.value.has(s.feature)).length
+        );
+
+        function buildTemplatePrompt() {
+          const active = sections.filter(s => !s.feature || enabledFeatures.value.has(s.feature));
+          const identity = active.find(s => s.id === 'identity');
+          const others = active.filter(s => s.id !== 'identity');
+
+          let parts = [];
+          parts.push('# Pi Coding Agent System Instructions\n');
+          parts.push('You are my local Pi coding agent on Windows. You are not just a chatbot. You are expected to use the installed Pi tools and extensions when useful.\n');
+
+          if (identity) parts.push('## Identity\n\n' + identity.example + '\n');
+
+          const toolLines = [];
+          if (enabledFeatures.value.has('todos')) toolLines.push('- mitsupi todos: persistent todo/task state');
+          if (enabledFeatures.value.has('review')) toolLines.push('- mitsupi review: review code changes before final answer');
+          if (enabledFeatures.value.has('commit')) toolLines.push('- mitsupi commit: help create clean commits when requested');
+          toolLines.push('- mitsupi files: inspect and work with project files');
+          if (enabledFeatures.value.has('permissions')) toolLines.push('- pi-hooks permissions: prevent unsafe actions');
+          if (enabledFeatures.value.has('checkpoint')) toolLines.push('- pi-hooks checkpoints: create restore points before risky edits');
+          if (enabledFeatures.value.has('lsp')) toolLines.push('- pi-hooks LSP diagnostics: inspect language/type errors');
+          if (enabledFeatures.value.has('web')) toolLines.push('- web search: research current docs, errors, packages, APIs');
+
+          if (toolLines.length) parts.push('## Installed Tools\n\n<available_tools>\n' + toolLines.join('\n') + '\n</available_tools>\n');
+
+          const special = ['tests'];
+          const tagged = others.filter(s => !special.includes(s.id));
+          tagged.forEach(s => { parts.push('## ' + s.title + '\n\n' + s.example + '\n'); });
+
+          const testsSection = active.find(s => s.id === 'tests');
+          if (testsSection) parts.push('## Verification Loop\n\n' + testsSection.example + '\n');
+
+          parts.push('## Final Response Format\n\n<final_response_format>\nWhen finished, respond with:\n1. What changed\n2. What was verified\n3. What remains or what is risky\n4. Suggested next step, if any\n</final_response_format>\n');
+
+          return parts.join('\n').replace(/\n{3,}/g, '\n\n').trim() + '\n';
+        }
+
+        const templatePrompt = computed(() => buildTemplatePrompt());
+
+        const enabledToolsList = computed(() => {
+          return tools.value.filter(t => t.on).map(t => t.name).join(', ');
+        });
+
+        watch(templatePrompt, (val) => {
+          if (!isDirty.value) {
+            editablePrompt.value = val;
+          }
+        }, { immediate: true });
+
+        watch(() => tools.value.map(t => t.on).join(','), () => {
+          isDirty.value = false;
+          editablePrompt.value = buildTemplatePrompt();
+        });
+
+        watch(() => ai.value.provider, (p) => {
+          if (p === 'openai') {
+            ai.value.model = 'gpt-4o';
+            ai.value.baseUrl = '';
+          } else if (p === 'openrouter') {
+            ai.value.model = 'anthropic/claude-sonnet-4-20250514';
+            ai.value.baseUrl = 'https://openrouter.ai/api/v1/chat/completions';
+          } else if (p === 'opencode') {
+            ai.value.model = 'anthropic/claude-sonnet-4-20250514';
+            ai.value.baseUrl = '';
+          } else if (p === 'ollama') {
+            ai.value.model = 'llama3';
+            ai.value.baseUrl = 'http://localhost:11434';
+          } else if (p === 'claude') {
+            ai.value.model = 'claude-sonnet-4-20250514';
+            ai.value.baseUrl = '';
+          }
+        });
+
+        const promptWords = computed(() => editablePrompt.value.split(/\s+/).filter(Boolean).length);
+        const promptLines = computed(() => editablePrompt.value.split('\n').length);
+        const templateLines = computed(() => templatePrompt.value.split('\n').length);
+        const aiResultLines = computed(() => aiResult.value ? aiResult.value.split('\n').length : 0);
+        const apiKeyPlaceholder = computed(() => {
+          const p = ai.value.provider;
+          if (p === 'openrouter') return 'sk-or-...';
+          if (p === 'opencode') return 'oc_...';
+          if (p === 'claude') return 'sk-ant-...';
+          if (p === 'ollama') return 'No key needed';
+          return 'sk-...';
+        });
+
+        function resyncFromTemplate() {
+          isDirty.value = false;
+          editablePrompt.value = buildTemplatePrompt();
+        }
+
+        function handleEdit() {
+          isDirty.value = true;
+        }
+
+        function getApiConfig() {
+          const p = ai.value.provider;
+          let url = ai.value.baseUrl;
+          let headers = {};
+          let body = {};
+
+          const systemMsg = HARNESS_PROMPT
+            .replace('{PROMPT}', editablePrompt.value)
+            .replace('{TOOLS}', enabledToolsList.value);
+
+          if (p === 'openai') {
+            if (!url) url = 'https://api.openai.com/v1/chat/completions';
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + ai.value.apiKey
+            };
+            body = {
+              model: ai.value.model,
+              messages: [
+                { role: 'system', content: systemMsg },
+                { role: 'user', content: 'Refine and strengthen my Pi coding agent system prompt. Return ONLY the refined prompt in Markdown, no explanation, no code fences.' }
+              ],
+              temperature: 0.4,
+              stream: true
+            };
+          } else if (p === 'openrouter') {
+            if (!url) url = 'https://openrouter.ai/api/v1/chat/completions';
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + ai.value.apiKey,
+              'HTTP-Referer': window.location.href,
+              'X-Title': 'Pi Prompt Builder'
+            };
+            body = {
+              model: ai.value.model,
+              messages: [
+                { role: 'system', content: systemMsg },
+                { role: 'user', content: 'Refine and strengthen my Pi coding agent system prompt. Return ONLY the refined prompt in Markdown, no explanation, no code fences.' }
+              ],
+              temperature: 0.4,
+              stream: true
+            };
+          } else if (p === 'opencode') {
+            if (!url) url = 'https://api.opencode.ai/v1/chat/completions';
+            headers = {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + ai.value.apiKey
+            };
+            body = {
+              model: ai.value.model,
+              messages: [
+                { role: 'system', content: systemMsg },
+                { role: 'user', content: 'Refine and strengthen my Pi coding agent system prompt. Return ONLY the refined prompt in Markdown, no explanation, no code fences.' }
+              ],
+              temperature: 0.4,
+              stream: true
+            };
+          } else if (p === 'ollama') {
+            if (!url) url = 'http://localhost:11434';
+            url = url.replace(/\/$/, '') + '/api/chat';
+            headers = { 'Content-Type': 'application/json' };
+            body = {
+              model: ai.value.model,
+              messages: [
+                { role: 'system', content: systemMsg },
+                { role: 'user', content: 'Refine and strengthen my Pi coding agent system prompt. Return ONLY the refined prompt in Markdown, no explanation, no code fences.' }
+              ],
+              stream: true
+            };
+          } else if (p === 'claude') {
+            if (!url) url = 'https://api.anthropic.com/v1/messages';
+            headers = {
+              'Content-Type': 'application/json',
+              'x-api-key': ai.value.apiKey,
+              'anthropic-version': '2023-06-01',
+              'anthropic-dangerous-direct-browser-access': 'true'
+            };
+            body = {
+              model: ai.value.model,
+              max_tokens: 4096,
+              system: systemMsg,
+              messages: [
+                { role: 'user', content: 'Refine and strengthen my Pi coding agent system prompt. Return ONLY the refined prompt in Markdown, no explanation, no code fences.' }
+              ],
+              stream: true
+            };
+          }
+
+          return { url, headers, body, provider: p };
+        }
+
+        async function aiEnhance() {
+          if (aiBusy.value) return;
+
+          if (ai.value.provider !== 'ollama' && !ai.value.apiKey) {
+            aiError.value = 'No API key set. Open AI Settings in the sidebar and enter your API key.';
+            showAiModal.value = true;
+            return;
+          }
+
+          aiBusy.value = true;
+          aiResult.value = '';
+          aiStreamText.value = '';
+          aiError.value = '';
+          showAiModal.value = true;
+
+          const config = getApiConfig();
+
+          try {
+            const resp = await fetch(config.url, {
+              method: 'POST',
+              headers: config.headers,
+              body: JSON.stringify(config.body)
+            });
+
+            if (!resp.ok) {
+              const errText = await resp.text();
+              throw new Error(`API returned ${resp.status}: ${errText.substring(0, 200)}`);
+            }
+
+            const reader = resp.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+            let buffer = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed || trimmed === ':') continue;
+
+                if (config.provider === 'ollama') {
+                  try {
+                    const json = JSON.parse(trimmed);
+                    if (json.message && json.message.content) {
+                      fullText += json.message.content;
+                      aiStreamText.value = fullText;
+                    }
+                  } catch (e) {}
+                } else if (config.provider === 'claude') {
+                  if (trimmed.startsWith('data: ')) {
+                    try {
+                      const json = JSON.parse(trimmed.slice(6));
+                      if (json.type === 'content_block_delta' && json.delta && json.delta.text) {
+                        fullText += json.delta.text;
+                        aiStreamText.value = fullText;
+                      }
+                    } catch (e) {}
+                  }
+                } else {
+                  if (trimmed.startsWith('data: ')) {
+                    const data = trimmed.slice(6);
+                    if (data === '[DONE]') continue;
+                    try {
+                      const json = JSON.parse(data);
+                      const delta = json.choices && json.choices[0] && json.choices[0].delta;
+                      if (delta && delta.content) {
+                        fullText += delta.content;
+                        aiStreamText.value = fullText;
+                      }
+                    } catch (e) {}
+                  }
+                }
+              }
+            }
+
+            if (!fullText) {
+              aiError.value = 'The API returned an empty response. Check your model name and API key.';
+            } else {
+              let cleaned = fullText.trim();
+              if (cleaned.startsWith('```')) {
+                cleaned = cleaned.replace(/^```(?:markdown|md)?\n?/, '').replace(/\n?```\s*$/, '');
+              }
+              aiResult.value = cleaned.trim();
+            }
+          } catch (err) {
+            let msg = err.message || 'Unknown error';
+            if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Network request failed')) {
+              msg = 'Network error (possible CORS issue). Try Ollama (local, no CORS) or an OpenAI-compatible proxy. Error: ' + msg;
+            }
+            aiError.value = msg;
+          } finally {
+            aiBusy.value = false;
+          }
+        }
+
+        function copyPrompt() {
+          navigator.clipboard.writeText(editablePrompt.value).then(() => {
+            toastVisible.value = true;
+            setTimeout(() => { toastVisible.value = false; }, 2000);
+          });
+        }
+
+        function copyResult() {
+          navigator.clipboard.writeText(aiResult.value).then(() => {
+            toastVisible.value = true;
+            setTimeout(() => { toastVisible.value = false; }, 2000);
+          });
+        }
+
+        function applyResult() {
+          editablePrompt.value = aiResult.value;
+          isDirty.value = true;
+          showAiModal.value = false;
+        }
+
+        function downloadPrompt() {
+          const blob = new Blob([editablePrompt.value], { type: 'text/markdown' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'pi-agent-system-instructions.md';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+
+        function resetAll() {
+          tools.value.forEach(t => t.on = true);
+          isDirty.value = false;
+          selected.value = 'identity';
+          nextTick(() => { editablePrompt.value = buildTemplatePrompt(); });
+        }
+
+        return {
+          sections, selected, tools, current,
+          editablePrompt, isDirty, templatePrompt,
+          promptWords, promptLines, templateLines, aiResultLines,
+          activeSections, enabledFeatures, apiKeyPlaceholder,
+          themes, theme, setTheme,
+          showAiSettings, showAiModal, aiBusy, aiResult, aiStreamText, aiError, toastVisible,
+          ai,
+          resyncFromTemplate, handleEdit,
+          aiEnhance, copyPrompt, copyResult, applyResult, downloadPrompt, resetAll
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

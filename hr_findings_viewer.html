@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Model HR Findings</title>
+  <style>
+    :root {
+      --bg: #101317;
+      --panel: #171c22;
+      --panel2: #202732;
+      --text: #edf2f7;
+      --muted: #9aa8b8;
+      --border: #2d3748;
+      --accent: #7dd3fc;
+      --good: #4ade80;
+      --warn: #facc15;
+      --bad: #fb7185;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Segoe UI, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: #0c0f13;
+    }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    .sub { color: var(--muted); font-size: 14px; }
+    .layout {
+      display: grid;
+      grid-template-columns: 390px minmax(0, 1fr);
+      min-height: calc(100vh - 82px);
+    }
+    aside {
+      border-right: 1px solid var(--border);
+      padding: 16px;
+      overflow: auto;
+    }
+    main {
+      padding: 18px;
+      overflow: auto;
+    }
+    input, select, textarea, button {
+      font: inherit;
+    }
+    .controls {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .card.active {
+      border-color: var(--accent);
+      background: var(--panel2);
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .model { font-weight: 700; }
+    .task { margin-top: 6px; color: var(--muted); font-size: 13px; }
+    .rating {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      text-transform: uppercase;
+    }
+    .rating.strong { color: var(--good); border-color: rgba(74, 222, 128, .35); }
+    .rating.medium { color: var(--warn); border-color: rgba(250, 204, 21, .35); }
+    .rating.weak, .rating.dangerous { color: var(--bad); border-color: rgba(251, 113, 133, .35); }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .tag {
+      color: var(--accent);
+      background: rgba(125, 211, 252, .08);
+      border: 1px solid rgba(125, 211, 252, .18);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .tag:hover { background: rgba(125, 211, 252, .16); }
+    .detail {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .detail h2 { margin: 0 0 8px; }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .section {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .section h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: var(--accent);
+    }
+    ul { margin: 0; padding-left: 20px; }
+    li { margin: 5px 0; }
+    .score {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 50px;
+    }
+    .tools {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    button {
+      border: 1px solid var(--border);
+      background: var(--panel2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      background: #0c0f13;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      resize: vertical;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--border); max-height: 45vh; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Model HR Findings</h1>
+    <div class="sub">Searchable evaluation log for CodeLens RN worker-model trials.</div>
+  </header>
+  <div class="layout">
+    <aside>
+      <div class="controls">
+        <input id="search" placeholder="Search model, task, tags, misses..." />
+        <select id="rating">
+          <option value="">All ratings</option>
+          <option value="strong">Strong</option>
+          <option value="medium">Medium</option>
+          <option value="weak">Weak</option>
+          <option value="dangerous">Dangerous</option>
+        </select>
+      </div>
+      <div id="cards"></div>
+    </aside>
+    <main>
+      <div id="detail" class="detail"></div>
+    </main>
+  </div>
+  <script type="application/json" id="hr-data">
+{
+  "schemaVersion": 2,
+  "purpose": "Track coding-model performance on bounded CodeLens RN refactor slices so future agents can choose the right worker model and improve prompts.",
+  "projects": {
+    "codelens-rn-ontology-profile": {
+      "repoPath": "C:/Projects/CodeLensApp/CodeLens-v2/codelens-rn",
+      "branch": "refactor/ontology-profile",
+      "handoff": "C:/Projects/CodeLensApp/CodeLens-v2/codelens-rn/ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+    }
+  },
+  "ratingScale": {
+    "ten": "Near-perfect worker result: exact scope discipline, explicit exceptions, complete verification, no reviewer interpretation needed.",
+    "strong": "Scoped, compatible, verified, easy to review.",
+    "medium": "Mostly correct but needs reviewer cleanup or leaves local naming/test gaps.",
+    "weak": "Useful fragments, but missed important boundaries or required substantial correction.",
+    "dangerous": "Touched forbidden areas, risked data loss, weakened tests, or made broad uncontrolled edits."
+  },
+  "tagTaxonomy": {
+    "projectTags": "Specific to CodeLens RN or the ontology-profile refactor branch.",
+    "stackTags": "Transferable within a technical stack, such as TypeScript, React Native, Drizzle, SQLite, Vitest, Expo, Zustand.",
+    "generalCodingTags": "Transferable across stacks, including Python, backend services, CLI tools, frontend apps, and data pipelines.",
+    "riskTags": "Areas where the model should be avoided or needs stronger review."
+  },
+  "generalCodingTagDefinitions": {
+    "bounded-refactor": "Can make small controlled changes without expanding scope.",
+    "compatibility-boundary": "Can preserve old/public/persistence API boundaries while improving internal code.",
+    "terminology-rename": "Can rename concepts consistently when given clear old/new vocabulary.",
+    "interface-propagation": "Can propagate type/interface changes through call sites.",
+    "test-discipline": "Runs relevant checks and uses failures constructively.",
+    "scope-control": "Avoids unrelated files and broad refactors.",
+    "reporting": "Produces a useful final report with what changed, what stayed legacy, and verification.",
+    "persistence-risk": "Needs extra caution around DB, migrations, import/export, or data-loss boundaries.",
+    "alias-migration": "Can add a preferred new field or API while preserving and documenting a legacy alias.",
+    "regression-guarding": "Can add targeted tests or source guards for known failure modes.",
+    "source-guards": "Can write source-level architecture guards where runtime tests would be too heavy.",
+    "prompt-style-aware": "Result includes enough prompt-shape metadata to compare fairly with other model runs."
+  },
+  "evaluations": [
+    {
+      "id": "2026-05-04-kimi-2-5-graph-type-node",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi 2.5",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Graph naming compatibility slice",
+      "slice": "Rename graph-owned ontology type naming from conceptType to typeNodeId while preserving LearningConcept.conceptType compatibility.",
+      "difficulty": "small-bounded-refactor",
+      "allowedWriteScope": [
+        "src/features/graph/**",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after minor reviewer polish.",
+      "strengths": [
+        "Stayed inside the graph boundary.",
+        "Preserved the domain compatibility boundary: LearningConcept.conceptType maps into GraphNode.typeNodeId.",
+        "Did not touch persistence, backup, codecs, or promotion.",
+        "Ran targeted tests and full suite.",
+        "Produced a small, reviewable diff."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens ontology-profile compatibility boundary between LearningConcept and GraphNode.",
+        "Used the existing graph feature boundaries instead of starting a wider app rename.",
+        "Kept current coding-profile behavior unchanged."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at bounded terminology refactors.",
+        "Good at preserving an explicit compatibility boundary while renaming internals.",
+        "Good at small interface/prop updates when tests and allowed write scope are clear.",
+        "Reliable enough to run as a worker on another repo for narrow, well-tested feature-local cleanup."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript interface/property renames cleanly across feature code and tests.",
+        "Worked well with React/React Native prop and component naming updates.",
+        "Used Vitest feedback effectively for a small feature slice.",
+        "Good candidate for TypeScript frontend or React Native feature-local naming cleanup."
+      ],
+      "misses": [
+        "Left helper name conceptTypeColor in graph internals.",
+        "Left warning/test wording saying unknown concept type."
+      ],
+      "reviewerFixes": [
+        "Renamed conceptTypeColor to typeNodeColor.",
+        "Changed warning/test wording to unknown ontology type node."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "Targeted graph/ontology/architecture tests: 27/27 passed",
+        "Full test suite: 315/315 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Small naming refactors",
+        "Bounded feature-internal cleanup",
+        "Compatibility-preserving type/interface renames with clear tests"
+      ],
+      "avoidFor": [
+        "Unbounded architecture planning until it proves itself on more slices",
+        "Data migration or backup/import logic without extra review"
+      ],
+      "promptImprovements": [
+        "Add explicit instruction to rename helper names, warning text, and test descriptions when the slice is about terminology.",
+        "Ask the worker to run rg for legacy terms inside the allowed write scope before final report."
+      ],
+      "usefulTools": [
+        "rg for leftover naming",
+        "TypeScript",
+        "targeted Vitest",
+        "full Vitest before acceptance"
+      ],
+      "tags": [
+        "graph",
+        "naming",
+        "typeNodeId",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "graph"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "terminology-rename",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control"
+      ],
+      "riskTags": [
+        "avoid-unbounded-architecture",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-04-mimo-2-5-pro-promotion-type-node",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Mimo 2.5 Pro",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Promotion naming compatibility slice",
+      "slice": "Rename promotion-owned ontology type naming from conceptType/proposedConceptType to typeNodeId/proposedTypeNodeId while preserving LearningConcept, capture hint, and DB cache compatibility boundaries.",
+      "difficulty": "medium-bounded-refactor",
+      "allowedWriteScope": [
+        "src/features/learning/promotion/**",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and handoff cleanup.",
+      "strengths": [
+        "Renamed promotion-owned interfaces, UI state, suggestion card props, cluster candidate fields, and review model fields consistently.",
+        "Preserved the explicit compatibility mapping from PromotionConfirmInput.typeNodeId to LearningConcept.conceptType.",
+        "Preserved the suggestions cache DB boundary by mapping proposedTypeNodeId to the legacy proposedConceptType column.",
+        "Preserved capture hint compatibility because capture codecs still expose proposedConceptType.",
+        "Stayed inside the requested promotion and handoff scope."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens promotion/cache/capture compatibility boundaries.",
+        "Kept the legacy suggestions cache DB column while improving promotion domain naming.",
+        "Kept capture hint names legacy because the current CodeLens codec shape still requires them."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at medium feature-local refactor slices.",
+        "Good at interface and UI state renames across several files.",
+        "Good at keeping persistence boundaries stable while changing domain-facing names.",
+        "Useful on another repo for scoped feature refactors that need careful old-name/new-name mapping."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript interface changes through service, hook, UI, codec, repo, and test layers.",
+        "Handled React Native state/prop renames without breaking component behavior.",
+        "Kept Drizzle/SQLite cache column naming stable while changing TypeScript domain names.",
+        "Used Vitest and TypeScript checks successfully for a medium feature-local slice."
+      ],
+      "misses": [
+        "The final report was cut off before the complete file list.",
+        "The handoff note used a non-ASCII arrow and the next-step list still needed reviewer cleanup.",
+        "It renamed cluster/suggestion domain fields too, which was acceptable but slightly broader than the minimum requested slice."
+      ],
+      "reviewerFixes": [
+        "Verified TypeScript, targeted tests, and full suite.",
+        "No code changes were needed after Mimo's implementation.",
+        "Cleaned the handoff note to use ASCII arrows.",
+        "Updated the handoff next-step queue to mark graph and promotion naming slices complete."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "Targeted promotion/ontology/architecture tests: 36/36 passed",
+        "Full test suite: 315/315 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Medium bounded refactor slices inside one feature",
+        "Compatibility-preserving interface and prop renames",
+        "UI/state naming cleanup with tests"
+      ],
+      "avoidFor": [
+        "Persistence migrations until it proves careful migration planning",
+        "Backup/import/export boundaries without strict raw-shape tests"
+      ],
+      "promptImprovements": [
+        "Ask for a final rg scan of old terminology inside the allowed write scope.",
+        "Require the final report to separate local internal renames from compatibility-boundary names intentionally left legacy.",
+        "Ask the worker to update the next-step list in the handoff when it completes a listed task."
+      ],
+      "usefulTools": [
+        "rg for leftover naming",
+        "TypeScript",
+        "targeted Vitest",
+        "full Vitest before acceptance"
+      ],
+      "tags": [
+        "promotion",
+        "naming",
+        "typeNodeId",
+        "proposedTypeNodeId",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "promotion"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "drizzle",
+        "sqlite",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "terminology-rename",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control"
+      ],
+      "riskTags": [
+        "avoid-migrations-without-review",
+        "avoid-backup-import-without-raw-shape-tests"
+      ]
+    },
+    {
+      "id": "2026-05-04-qwen-3-6-plus-retrieval-type-node",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Retrieval naming compatibility slice",
+      "slice": "Rename retrieval-owned concept payload/filter naming from conceptType/conceptTypes to typeNodeId/typeNodeIds while preserving conceptTypes as a compatibility alias.",
+      "difficulty": "medium-bounded-refactor",
+      "allowedWriteScope": [
+        "src/features/learning/retrieval/**",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification; no code changes needed.",
+      "strengths": [
+        "Renamed RetrievedConceptPayload.conceptType to typeNodeId consistently through retrieval types, codecs, row mappers, formatting, and tests.",
+        "Added preferred RetrieveFilters.typeNodeIds while preserving legacy conceptTypes compatibility.",
+        "Implemented union behavior when both typeNodeIds and conceptTypes are present.",
+        "Kept raw DB concept_type/type_node_id names at the row mapper persistence boundary.",
+        "Updated downstream dot-connector call sites that consume RetrievedConceptPayload."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens retrieval payload compatibility boundary.",
+        "Kept conceptTypes as an intentional legacy retrieval filter alias.",
+        "Respected migration 011 dual-read semantics in retrieval row mapping."
+      ],
+      "generalizedStackStrengths": [
+        "Handled TypeScript payload/interface renames through codecs, data mappers, formatters, UI consumers, and tests.",
+        "Used Zod codec updates correctly for renamed fields and compatibility aliases.",
+        "Handled React Native downstream call-site updates caused by a TypeScript payload rename.",
+        "Used Vitest and TypeScript checks successfully for a medium feature-local slice."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at compatibility-preserving API evolution.",
+        "Good at adding preferred new fields while keeping legacy aliases.",
+        "Good at following type changes into downstream consumers when required by compilation.",
+        "Good at documenting remaining legacy names with boundary reasons."
+      ],
+      "misses": [
+        "Touched dot-connector files outside the initial allowed write scope, though the changes were necessary downstream call-site repairs.",
+        "The handoff next-step wording around graph still needed reviewer interpretation because previous completed items were already evolving."
+      ],
+      "reviewerFixes": [
+        "Verified TypeScript, targeted tests, and full suite.",
+        "No code changes were needed after Qwen's implementation.",
+        "Accepted the dot-connector edits as necessary downstream consumers of the renamed retrieval payload."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "Targeted retrieval/ontology/architecture tests: 38/38 passed",
+        "Full test suite: 315/315 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Medium compatibility-preserving API rename slices",
+        "TypeScript payload/interface migration with Zod codec updates",
+        "Feature-local refactors with limited downstream call-site repairs"
+      ],
+      "avoidFor": [
+        "Persistence migrations until it proves careful migration planning",
+        "Backup/import/export boundaries without strict raw-shape tests"
+      ],
+      "promptImprovements": [
+        "Allowed write scope should explicitly permit downstream call-site fixes when changing exported types.",
+        "Ask the worker to separate in-scope files from necessary downstream consumer fixes in the final report.",
+        "Keep the required rg search; it produced useful evidence for remaining legacy names."
+      ],
+      "usefulTools": [
+        "rg for legacy naming",
+        "TypeScript",
+        "Zod codec tests",
+        "targeted Vitest",
+        "full Vitest"
+      ],
+      "tags": [
+        "retrieval",
+        "naming",
+        "typeNodeId",
+        "typeNodeIds",
+        "compatibility-alias",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "retrieval"
+      ],
+      "stackTags": [
+        "typescript",
+        "zod",
+        "react-native",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "terminology-rename",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "alias-migration"
+      ],
+      "riskTags": [
+        "watch-allowed-scope-expansion",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-04-minimax-m-2-7-type-node-chip",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "MiniMax M 2.7",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "UI primitive terminology cleanup slice",
+      "slice": "Rename the reusable UI primitive from ConceptTypeChip/type to TypeNodeChip/typeNodeId while preserving card boundary conceptType props.",
+      "difficulty": "small-bounded-refactor",
+      "allowedWriteScope": [
+        "src/features/learning/ui/**",
+        "src/features/learning/promotion/ui/PromotionSuggestionCard.tsx",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "medium",
+      "score": 7,
+      "outcome": "Accepted after reviewer code polish to make the deprecated shim truly backwards-compatible.",
+      "strengths": [
+        "Created TypeNodeChip with typeNodeId prop and updated current call sites.",
+        "Kept card boundary conceptType props where they mirror LearningConcept.conceptType or capture hint compatibility.",
+        "Used the scope exception policy correctly for ReviewSessionScreen and explained why the downstream edit was necessary.",
+        "Ran TypeScript, targeted tests, full suite, and reported the terminology rg audit."
+      ],
+      "projectSpecificStrengths": [
+        "Understood CodeLens UI card boundary compatibility around conceptType props.",
+        "Kept LearningConcept.conceptType and capture hint proposedConceptType untouched.",
+        "Updated the handoff with the UI primitive rename."
+      ],
+      "generalizedStackStrengths": [
+        "Handled React Native component and prop renames across current call sites.",
+        "Handled TypeScript compile-driven downstream UI call-site repair.",
+        "Used Vitest and TypeScript checks successfully for a small UI slice."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at bounded UI terminology refactors.",
+        "Good at following explicit final-report structure.",
+        "Good at reporting scope exceptions instead of hiding them.",
+        "Needs stronger compatibility-wrapper reasoning before being trusted with public shim work."
+      ],
+      "misses": [
+        "The deprecated ConceptTypeChip shim re-exported TypeNodeChip directly, so old callers using the old type prop would not be genuinely backwards-compatible.",
+        "Claimed the shim kept existing imports working, but did not preserve the old prop API until reviewer fixed it.",
+        "No dedicated test covered old ConceptTypeChip compatibility."
+      ],
+      "reviewerFixes": [
+        "Changed ConceptTypeChip.tsx from a direct re-export to a real wrapper accepting the old type prop and passing it to TypeNodeChip as typeNodeId.",
+        "Adjusted the wrapper for exactOptionalPropertyTypes so undefined size is not passed explicitly.",
+        "Verified TypeScript, targeted UI/ontology/architecture tests, and full suite after the fix."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed after reviewer shim fix",
+        "Targeted UI/ontology/architecture tests: 22/22 passed",
+        "Full test suite: 315/315 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Small UI rename slices with reviewer oversight",
+        "React Native component call-site updates",
+        "Tasks where scope-exception reporting is important"
+      ],
+      "avoidFor": [
+        "Public compatibility shims without explicit wrapper tests",
+        "Persistence or backup/import/export work",
+        "Broad API migrations"
+      ],
+      "promptImprovements": [
+        "When asking for a deprecated shim, explicitly require preserving both old import name and old prop API.",
+        "Require a small compatibility test or type-level check for deprecated wrappers.",
+        "Ask the worker to distinguish module-name compatibility from prop/API compatibility."
+      ],
+      "usefulTools": [
+        "rg for old component names",
+        "TypeScript",
+        "targeted Vitest",
+        "full Vitest"
+      ],
+      "tags": [
+        "ui",
+        "react-native",
+        "naming",
+        "TypeNodeChip",
+        "compatibility-shim",
+        "medium",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "learning-ui"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tsx",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "terminology-rename",
+        "interface-propagation",
+        "test-discipline",
+        "scope-control",
+        "scope-exception-reporting",
+        "compatibility-shim-risk"
+      ],
+      "riskTags": [
+        "watch-compatibility-shims",
+        "avoid-public-api-shims-without-tests",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-04-deepseek-v4-pro-pi-type-node-chip-guards",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "DeepSeek V4 Pro",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "TypeNodeChip compatibility guard tests",
+      "slice": "Add source-level regression guards for TypeNodeChip and the deprecated ConceptTypeChip compatibility wrapper.",
+      "difficulty": "small-test-guard-slice",
+      "allowedWriteScope": [
+        "src/features/learning/ui/cards/__tests__/stage3-card-guards.test.ts",
+        "src/features/learning/ui/__tests__/stage4-hub-guards.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification; no code changes needed.",
+      "strengths": [
+        "Stayed test-only and within allowed scope.",
+        "Added focused guards for TypeNodeChip preferred API and ConceptTypeChip deprecated wrapper compatibility.",
+        "Guarded the exact prior failure mode: a bare re-export shim that preserves import name but drops old prop API.",
+        "Added adoption guards for PromotionSuggestionCard and ReviewSessionScreen.",
+        "Ran TypeScript, targeted tests, full suite, and reported rg findings."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens TypeNodeChip / ConceptTypeChip compatibility issue.",
+        "Updated the handoff note to distinguish compatibility wrapper from re-export shim.",
+        "Kept production code untouched because it was already correct."
+      ],
+      "generalizedStackStrengths": [
+        "Good at TypeScript/TSX source-level guard tests.",
+        "Good at regression tests for React Native component API adoption.",
+        "Used Vitest stage guard style consistently with the repo."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at targeted regression test creation when given a precise failure mode.",
+        "Good at preserving scope on test-only tasks.",
+        "Good at distinguishing compatibility wrapper behavior from simple re-export behavior.",
+        "Better under Pi with tight prompt constraints than previous OpenCode CLI run."
+      ],
+      "misses": [
+        "Some regex guards are source-shape based rather than runtime render tests, but this matches the existing stage guard style and avoids new dependencies.",
+        "Did not add a dedicated component render test, which was acceptable because the prompt asked to prefer source-level guards."
+      ],
+      "reviewerFixes": [
+        "Verified TypeScript, targeted tests, full suite, and rg output.",
+        "No code changes were needed after DeepSeek's Pi implementation."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "Targeted UI/ontology/architecture tests: 32/32 passed",
+        "Full test suite: 325/325 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Focused regression guard tests",
+        "Source-level architecture guard tests",
+        "Test-only slices with precise failure modes"
+      ],
+      "avoidFor": [
+        "Persistence or backup/import/export work",
+        "High-risk runtime boundary implementation without strict review",
+        "Broad implementation slices without tight constraints"
+      ],
+      "promptImprovements": [
+        "DeepSeek performs much better under Pi when the prompt is test-only, tightly scoped, and names the exact prior failure mode.",
+        "Keep explicit do-not-edit lists and production-code-change rules.",
+        "Use source-level guard tasks to evaluate discipline before implementation tasks."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest stage guard tests",
+        "full Vitest"
+      ],
+      "tags": [
+        "tests",
+        "ui",
+        "TypeNodeChip",
+        "compatibility-shim",
+        "regression-guards",
+        "strong",
+        "test-only"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "learning-ui"
+      ],
+      "stackTags": [
+        "typescript",
+        "tsx",
+        "react-native",
+        "vitest",
+        "source-guards"
+      ],
+      "generalCodingTags": [
+        "test-discipline",
+        "regression-guarding",
+        "scope-control",
+        "compatibility-shim-risk",
+        "failure-mode-targeting"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-broad-implementation-without-tight-prompt"
+      ]
+    },
+    {
+      "id": "2026-05-04-glm-5-1-naming-boundary-guards",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "GLM 5.1",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Ontology-profile naming boundary architecture guards",
+      "slice": "Add source-level architecture guards and anti-regression docs for renamed typeNodeId/proposedTypeNodeId boundaries while allowing documented legacy conceptType/proposedConceptType boundaries.",
+      "difficulty": "medium-test-guard-slice",
+      "allowedWriteScope": [
+        "src/__tests__/stage10-architecture-guards.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and a one-word documentation typo fix.",
+      "strengths": [
+        "Added precise stage10 guards for graph, promotion, retrieval, and chip naming boundaries.",
+        "Avoided the dangerous global ban on conceptType/proposedConceptType.",
+        "Documented allowed legacy boundaries in anti-regression rules.",
+        "Kept the slice guard/doc-only with no production code changes.",
+        "Ran TypeScript, targeted tests, full suite, and reported rg findings."
+      ],
+      "projectSpecificStrengths": [
+        "Understood CodeLens ontology-profile boundary distinctions across graph, promotion, retrieval, UI, DB, and domain types.",
+        "Updated the anti-regression rules in a way future agents can follow.",
+        "Kept LearningConcept.conceptType and ConceptHint.proposedConceptType allowed where they are still compatibility boundaries."
+      ],
+      "generalizedStackStrengths": [
+        "Good at TypeScript source-level architecture guards.",
+        "Good at Vitest guard-style tests that inspect source files.",
+        "Good at documenting framework/codebase naming boundaries for future agents."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at boundary-aware regression guarding.",
+        "Good at distinguishing local renamed internals from public/legacy compatibility surfaces.",
+        "Good at test/doc slices with no production churn.",
+        "Useful for architecture-rule hardening after implementation slices."
+      ],
+      "misses": [
+        "Report said 7 new tests, but the actual stage10 diff added 5 tests; the remaining adoption guards already existed in stage3/stage4.",
+        "Documentation had a minor typo: Persistance instead of Persistence.",
+        "Some guards are regex/source-shape based, but that is consistent with this repo's existing architecture guard style."
+      ],
+      "reviewerFixes": [
+        "Fixed the anti-regression doc typo from Persistance to Persistence.",
+        "Verified TypeScript, targeted tests, full suite, and rg output.",
+        "No production code changes were needed after GLM's implementation."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "Targeted architecture/UI/ontology tests: 37/37 passed",
+        "Full test suite: 330/330 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Architecture guard tests",
+        "Anti-regression documentation",
+        "Boundary-aware source-level test slices",
+        "Post-refactor guard hardening"
+      ],
+      "avoidFor": [
+        "Runtime implementation until tested on more code-changing slices",
+        "Persistence or backup/import/export work",
+        "Broad refactors without tight scope"
+      ],
+      "promptImprovements": [
+        "Ask GLM to count actual new tests separately from inherited related guards.",
+        "Keep explicit allowed legacy boundary lists in guard prompts.",
+        "Use it for guard/doc hardening after another model implements a slice."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest architecture guards",
+        "full Vitest"
+      ],
+      "tags": [
+        "architecture-guards",
+        "anti-regression",
+        "naming-boundaries",
+        "typeNodeId",
+        "compatibility-boundary",
+        "strong",
+        "test-doc-slice"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "architecture-guards"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "source-guards",
+        "markdown-docs"
+      ],
+      "generalCodingTags": [
+        "regression-guarding",
+        "compatibility-boundary",
+        "scope-control",
+        "test-discipline",
+        "documentation-discipline",
+        "boundary-taxonomy"
+      ],
+      "riskTags": [
+        "watch-test-count-reporting",
+        "avoid-persistence-without-review",
+        "avoid-broad-implementation-without-tight-prompt"
+      ]
+    },
+    {
+      "id": "2026-05-04-kimi-k2-6-concept-list-filter-alias",
+      "date": "2026-05-04",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi",
+      "reviewerModel": "Codex GPT-5",
+      "task": "Concept-list filter naming compatibility slice",
+      "slice": "Add preferred ConceptListFilters.typeNodeIds while preserving ConceptListFilters.conceptType as a legacy single-type alias, with union filtering behavior.",
+      "difficulty": "small-bounded-refactor",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "compatibility-alias-refactor",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/learning/hooks/useConceptList.ts",
+        "src/features/learning/ui/__tests__/stage4-hub-guards.test.ts",
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi K2.6 can execute a professional scoped ticket with compatibility aliases, source guards, rg reporting, and full verification.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 is a good candidate for strict bounded implementation tickets.",
+        "Keep compatibility aliases and allowed legacy boundaries explicit in the prompt.",
+        "Continue requiring rg/search output and full-suite verification.",
+        "For the next Kimi K2.6 slice, add a small runtime/unit behavior test if the hook/function can be tested cheaply; source guards alone are acceptable only when consistent with repo style."
+      ],
+      "allowedWriteScope": [
+        "src/features/learning/hooks/useConceptList.ts",
+        "src/features/learning/ui/__tests__/stage4-hub-guards.test.ts",
+        "src/__tests__/stage10-architecture-guards.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer verification and documentation/HR sync; no worker code changes were needed after review.",
+      "strengths": [
+        "Added preferred typeNodeIds filter while preserving conceptType as a legacy alias.",
+        "Implemented union behavior with Set<ConceptType>, matching the retrieval compatibility pattern.",
+        "Kept LearningConcept.conceptType as a read-only compatibility/domain field instead of renaming it globally.",
+        "Added source guards in stage4 and stage10 for the hook-owned API boundary.",
+        "Ran TypeScript, targeted tests, full suite, and provided a useful rg summary."
+      ],
+      "projectSpecificStrengths": [
+        "Understood the CodeLens ontology-profile naming boundary around hook-owned filters versus LearningConcept compatibility fields.",
+        "Aligned concept-list filtering with the retrieval typeNodeIds/conceptTypes union pattern already established on the branch.",
+        "Updated the anti-regression naming table with the new hook-owned preferred field and legacy alias."
+      ],
+      "generalizedStackStrengths": [
+        "Handled a TypeScript hook filter API extension without breaking callers.",
+        "Used union-style compatibility behavior in a small React Native/TanStack Query hook slice.",
+        "Added Vitest source guards consistent with the repo stage-guard pattern.",
+        "Produced clear verification output for TypeScript and Vitest."
+      ],
+      "generalizedCodingStrengths": [
+        "Good at strict bounded ticket execution.",
+        "Good at compatibility-alias refactors where old and new fields must coexist.",
+        "Good at preserving domain/public boundaries while improving feature-owned naming.",
+        "Good at final reporting when the prompt specifies required sections."
+      ],
+      "misses": [
+        "Tests were source-level guards rather than a direct runtime/unit test of filtering behavior; acceptable for this slice but not ideal for every hook change.",
+        "CodeLens handoff needed reviewer polish to add the new hook/test files to the changed-file list and record latest verification.",
+        "Reviewer normalized small documentation formatting so future prompts stay ASCII-friendly."
+      ],
+      "reviewerFixes": [
+        "Verified TypeScript, targeted tests, and full suite.",
+        "No production code changes were needed after Kimi K2.6 implementation.",
+        "Updated CodeLens implementation_handoff.md with changed files, latest verification, and completed next-step queue item.",
+        "Normalized touched refactor docs to ASCII-friendly wording.",
+        "Updated Pi HR database/docs with prompt-style metadata and fresh-start workflow context."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: passed",
+        "Targeted tests: 28/28 passed across 3 files",
+        "Full test suite: 333/333 passed across 49 files"
+      ],
+      "recommendedUse": [
+        "Strict bounded compatibility-alias refactor tickets",
+        "Small TypeScript hook/API cleanup slices",
+        "Feature-local naming refactors with explicit legacy boundaries",
+        "Worker tasks where the expected diff can be reviewed quickly"
+      ],
+      "avoidFor": [
+        "Persistence migrations or backup/import/export work until separately proven",
+        "Broad architecture decisions without a smaller trial",
+        "Loose exploratory implementation prompts where scope is not explicit"
+      ],
+      "promptImprovements": [
+        "Keep using strict bounded ticket prompts for Kimi K2.6 implementation work.",
+        "When behavior is easy to unit test, require an actual behavior test in addition to source guards.",
+        "Continue requiring final rg output summaries for compatibility terminology.",
+        "Record promptStyle and evaluationMeaning so future HR comparisons are fair."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest stage guards",
+        "full Vitest"
+      ],
+      "tags": [
+        "concept-list",
+        "typeNodeIds",
+        "compatibility-alias",
+        "strict-bounded-ticket",
+        "strong",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "learning-hooks"
+      ],
+      "stackTags": [
+        "typescript",
+        "react-native",
+        "tanstack-query",
+        "vitest",
+        "source-guards"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "terminology-rename",
+        "alias-migration",
+        "test-discipline",
+        "scope-control",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "needs-runtime-tests-for-behavior-heavy-hooks"
+      ]
+    }
+  ],
+  "generalizedLessons": [
+    {
+      "id": "terminology-refactor-slices",
+      "lesson": "For naming refactors, require a final rg scan for the old terminology inside the allowed write scope.",
+      "appliesTo": [
+        "Kimi 2.5",
+        "Mimo 2.5 Pro",
+        "future bounded refactor workers"
+      ]
+    },
+    {
+      "id": "persistence-boundary-proof",
+      "lesson": "For persistence or backup work, require tests against the real runtime boundary shape, not only codec/domain-shaped objects.",
+      "appliesTo": [
+        "all Pi worker models"
+      ]
+    },
+    {
+      "id": "validate-before-wipe",
+      "lesson": "Any import/restore task must validate and decode all incoming data before clearing current data.",
+      "appliesTo": [
+        "all models"
+      ]
+    },
+    {
+      "id": "compatibility-boundaries",
+      "lesson": "A legacy name can remain only when it crosses a real compatibility, persistence, or public API boundary. Local internals should move to the new vocabulary.",
+      "appliesTo": [
+        "all ontology profile refactor slices"
+      ]
+    },
+    {
+      "id": "project-vs-general-signal",
+      "lesson": "Record project-specific strengths separately from generalized stack strengths and generalized coding strengths so future model choice can transfer to other repositories without overfitting to one codebase.",
+      "appliesTo": [
+        "all model evaluations"
+      ]
+    },
+    {
+      "id": "prompt-style-records",
+      "lesson": "Record promptStyle, taskType, promptStrictness, contextProvided, allowedWriteScopeStyle, evaluationMeaning, and promptAdaptationNotes so future model comparisons account for prompt shape.",
+      "appliesTo": [
+        "all model evaluations"
+      ]
+    },
+    {
+      "id": "compatibility-alias-slices",
+      "lesson": "For preferred-new-field plus legacy-alias changes, specify preferred-only, legacy-only, and both-present behavior. Require a direct behavior test when cheap; source guards are acceptable only when they match repo guard style.",
+      "appliesTo": [
+        "Kimi K2.6",
+        "Qwen 3.6 Plus",
+        "future compatibility-alias workers"
+      ]
+    }
+  ],
+  "promptStyleTaxonomy": {
+    "strict bounded ticket": "Exact context files, explicit write scope, compatibility boundaries, verification commands, rg/search requirements, and final report format.",
+    "test-only guard": "Production code is out of scope; worker adds regression or architecture guards for a known failure mode.",
+    "architecture/doc guard": "Documentation and source-level architecture guard hardening after implementation slices.",
+    "loose exploratory": "Read-only or planning-oriented investigation with more autonomy; avoid for destructive or persistence work."
+  },
+  "promptAdaptationRules": [
+    "Record promptStyle, taskType, promptStrictness, contextProvided, allowedWriteScopeStyle, evaluationMeaning, and promptAdaptationNotes for new evaluations.",
+    "Use strict bounded tickets for implementation work by cheap/open-weight workers until a model proves broader autonomous planning.",
+    "For compatibility aliases, require preferred-only, legacy-only, and both-present behavior to be specified and tested or guarded.",
+    "For persistence-adjacent work, require raw boundary-shape tests and validate-before-wipe behavior, or keep the worker draft-only."
+  ]
+}
+</script>
+  <script>
+    const db = JSON.parse(document.getElementById('hr-data').textContent);
+    const cards = document.getElementById('cards');
+    const detail = document.getElementById('detail');
+    const search = document.getElementById('search');
+    const rating = document.getElementById('rating');
+    let selectedId = db.evaluations[0]?.id || null;
+
+    function textOf(ev) {
+      return [
+        ev.model, ev.runner, ev.task, ev.slice, ev.difficulty, ev.rating, ev.outcome,
+        ev.promptStyle, ev.taskType, ev.promptStrictness, ev.evaluationMeaning,
+        ...(ev.strengths || []), ...(ev.projectSpecificStrengths || []), ...(ev.generalizedStackStrengths || []), ...(ev.generalizedCodingStrengths || []), ...(ev.misses || []), ...(ev.reviewerFixes || []),
+        ...(ev.recommendedUse || []), ...(ev.avoidFor || []), ...(ev.promptImprovements || []),
+        ...(ev.contextProvided || []), ...(ev.promptAdaptationNotes || []),
+        ...(ev.tags || []), ...(ev.projectTags || []), ...(ev.stackTags || []), ...(ev.generalCodingTags || []), ...(ev.riskTags || [])
+      ].join(' ').toLowerCase();
+    }
+
+    function filtered() {
+      const q = search.value.trim().toLowerCase();
+      return db.evaluations.filter(ev => {
+        if (rating.value && ev.rating !== rating.value) return false;
+        return !q || textOf(ev).includes(q);
+      });
+    }
+
+    function list(items) {
+      return '<ul>' + (items || []).map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>';
+    }
+
+    function tagList(items) {
+      return '<div class="tags">' + (items || []).map(tag => `<span class="tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join('') + '</div>';
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function renderCards() {
+      const rows = filtered();
+      cards.innerHTML = rows.map(ev => `
+        <div class="card ${ev.id === selectedId ? 'active' : ''}" data-id="${escapeHtml(ev.id)}">
+          <div class="row">
+            <div class="model">${escapeHtml(ev.model)}</div>
+            <div class="rating ${escapeHtml(ev.rating)}">${escapeHtml(ev.rating)} ${escapeHtml(ev.score)}/10</div>
+          </div>
+          <div class="task">${escapeHtml(ev.task)}</div>
+          <div class="tags">${[...(ev.generalCodingTags || []), ...(ev.stackTags || [])].slice(0, 8).map(tag => `<span class="tag" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join('')}</div>
+        </div>
+      `).join('') || '<div class="empty">No matching evaluations.</div>';
+
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+          selectedId = card.dataset.id;
+          render();
+        });
+      });
+      document.querySelectorAll('[data-tag]').forEach(tag => {
+        tag.addEventListener('click', (event) => {
+          event.stopPropagation();
+          search.value = tag.dataset.tag || '';
+          render();
+        });
+      });
+
+      if (rows.length && !rows.some(ev => ev.id === selectedId)) selectedId = rows[0].id;
+    }
+
+    function renderDetail() {
+      const ev = db.evaluations.find(item => item.id === selectedId);
+      if (!ev) {
+        detail.innerHTML = '<div class="empty">Select an evaluation.</div>';
+        return;
+      }
+      detail.innerHTML = `
+        <h2>${escapeHtml(ev.model)} - ${escapeHtml(ev.task)}</h2>
+        <div class="meta">${escapeHtml(ev.date)} · worker: ${escapeHtml(ev.runner)} · reviewer: ${escapeHtml(ev.reviewerModel || 'unknown')} · ${escapeHtml(ev.difficulty)}</div>
+        <div class="section">
+          <div class="row">
+            <div>
+              <h3>Outcome</h3>
+              <div>${escapeHtml(ev.outcome)}</div>
+            </div>
+            <div class="score">${escapeHtml(ev.score)}/10</div>
+          </div>
+        </div>
+        <div class="section"><h3>Slice</h3><div>${escapeHtml(ev.slice)}</div></div>
+        <div class="section"><h3>Prompt Style</h3><div>${escapeHtml(ev.promptStyle || 'not recorded')} | ${escapeHtml(ev.taskType || 'task type not recorded')} | strictness: ${escapeHtml(ev.promptStrictness || 'not recorded')}</div><div>${escapeHtml(ev.evaluationMeaning || '')}</div></div>
+        <div class="section"><h3>Context Provided</h3>${list(ev.contextProvided)}</div>
+        <div class="section"><h3>Prompt Adaptation Notes</h3>${list(ev.promptAdaptationNotes)}</div>
+        <div class="section"><h3>Strengths</h3>${list(ev.strengths)}</div>
+        <div class="section"><h3>Project-Specific Strengths</h3>${list(ev.projectSpecificStrengths)}</div>
+        <div class="section"><h3>Generalized Stack Strengths</h3>${list(ev.generalizedStackStrengths)}</div>
+        <div class="section"><h3>Generalized Coding Strengths</h3>${list(ev.generalizedCodingStrengths)}</div>
+        <div class="section"><h3>Project Tags</h3>${tagList(ev.projectTags)}</div>
+        <div class="section"><h3>Stack Tags</h3>${tagList(ev.stackTags)}</div>
+        <div class="section"><h3>General Coding Tags</h3>${tagList(ev.generalCodingTags)}</div>
+        <div class="section"><h3>Risk Tags</h3>${tagList(ev.riskTags)}</div>
+        <div class="section"><h3>Misses</h3>${list(ev.misses)}</div>
+        <div class="section"><h3>Reviewer Fixes</h3>${list(ev.reviewerFixes)}</div>
+        <div class="section"><h3>Verification</h3>${list(ev.verification)}</div>
+        <div class="section"><h3>Recommended Use</h3>${list(ev.recommendedUse)}</div>
+        <div class="section"><h3>Avoid For</h3>${list(ev.avoidFor)}</div>
+        <div class="section"><h3>Prompt Improvements</h3>${list(ev.promptImprovements)}</div>
+        <div class="section"><h3>Useful Tools</h3>${list(ev.usefulTools)}</div>
+        <div class="section"><h3>LLM Search Blob</h3><textarea readonly>${escapeHtml(JSON.stringify(ev, null, 2))}</textarea></div>
+      `;
+      document.querySelectorAll('[data-tag]').forEach(tag => {
+        tag.addEventListener('click', () => {
+          search.value = tag.dataset.tag || '';
+          render();
+        });
+      });
+    }
+
+    function render() {
+      renderCards();
+      renderDetail();
+    }
+
+    search.addEventListener('input', render);
+    rating.addEventListener('change', render);
+    render();
+  </script>
+</body>
+</html>

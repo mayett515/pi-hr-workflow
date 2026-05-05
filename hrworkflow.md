@@ -12,10 +12,11 @@ This workflow is for testing local or cheap coding models as bounded workers whi
 
 Codex may run Pi directly when the user asks to delegate a bounded worker slice.
 
-Use the Pi CLI in non-interactive mode so the run is reproducible:
+Use the Pi CLI in non-interactive JSON mode so the run is reproducible and tool calls are auditable:
 
 ```powershell
-pi --model <provider/model-or-pattern> --thinking <level> --tools read,grep,find,ls,edit,bash -p @<prompt-file>
+$prompt = Get-Content -Raw C:\pi-stuff\prompts\<ticket>.md
+pi --model <provider/model-or-pattern> --thinking high --session-dir C:\pi-stuff\sessions --tools "read,grep,find,ls,edit,bash" --mode json -p $prompt
 ```
 
 List/select Pi models with:
@@ -23,7 +24,7 @@ List/select Pi models with:
 ```powershell
 pi --list-models <search>
 pi --list-models opencode-go
-pi --model opencode-go/qwen3.6-plus --thinking high -p @<prompt-file>
+pi --model opencode-go/qwen3.6-plus --thinking high --mode json -p $prompt
 ```
 
 In this HR workflow, `opencode-go/...` means the OpenCode model provider exposed inside Pi. Do not use the separate `opencode` CLI for HR worker runs.
@@ -33,8 +34,27 @@ Do not rely on interactive `/model` selection for HR runs unless the human is dr
 Recommended session shape:
 
 ```powershell
-pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+$prompt = Get-Content -Raw C:\pi-stuff\prompts\<ticket>.md
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools "read,grep,find,ls,edit,bash" --mode json -p $prompt
 ```
+
+For Codex-run HR work, real worker runs must use `--thinking high`. Low-thinking commands may be used only for disposable CLI syntax probes and must not be scored as HR evaluations.
+
+On Windows PowerShell, quote the comma-separated `--tools` allowlist. Prefer passing prompt content via `$prompt = Get-Content -Raw ...` and `-p $prompt`; do not rely on `-p @prompt.md` for scored runs, because `@file` can be interpreted as attached context rather than the actual worker instruction in ways that make the run harder to audit.
+
+On Windows, set `PI_PERMISSION_LEVEL=high` in the launching shell **before** running Pi. Lower levels (`minimal`/`low`) silently block the `edit` and `bash` tools, so the worker can plan the change but never writes - the slice will exit 0 and produce no diff. The HR ticket itself bounds the worker, not the runtime permission level.
+
+```powershell
+$env:PI_PERMISSION_LEVEL = 'high'
+```
+
+```bash
+export PI_PERMISSION_LEVEL=high
+```
+
+On Windows PowerShell 5.1, do **not** pipe Pi `--mode json` output through `Tee-Object`. PS 5.1 wraps native-exe stdout in a way that can deadlock the run (observed: a slice that ran for 30+ minutes producing zero stdout while the underlying Pi process was healthy). Either invoke Pi from Git Bash with `> file 2>&1` for the stdout audit, or rely on Pi's own `--session-dir` JSONL log.
+
+Local setup note: full `npm:mitsupi` should stay installed, but its package manifest has been changed to enumerate all extensions except `extensions/go-to-bed.ts`. If a package update restores the quiet-hours/go-to-bed extension and it blocks a non-interactive Pi worker after the human has explicitly asked to continue, do not treat the first refusal as a model-quality evaluation. Disable only that extension again, or use `--no-extensions` as a temporary fallback while keeping `PI_PERMISSION_LEVEL=high`, `--thinking high`, `--mode json`, and the normal tool allowlist. Record which path was used in HR.
 
 Codex should not use Pi as a second orchestrator. Pi is the bounded worker. Codex remains the reviewer and decision gate.
 
@@ -68,6 +88,16 @@ After Pi finishes, Codex must:
 - update `model_hr_db.json`, `hr_findings_viewer.html`, and HR markdown docs if this was a real worker evaluation
 - clearly separate Pi's work from Codex reviewer fixes in the HR record
 
+If the accepted or rejected worker result scores **7/10 or below**, Codex must pause the batch before launching another edit-capable slice. Do a short failure review first:
+
+- what went wrong
+- whether the issue was model behavior, prompt design, task choice, or reviewer cleanup
+- whether any worker code/docs were rejected, reverted, trimmed, or repaired
+- what prompt or assignment rule changes are needed before that model gets similar work again
+- whether the model should move to a lower-trust category for that task type
+
+Record that review in the HR evaluation and promote any general lesson into `FUTURE_PI_PROMPTING.md` or this workflow. Do not continue a multi-slice batch past a `<= 7` result until this review is written.
+
 If Pi requires an architectural choice to continue, the correct behavior is to stop and ask the human. Do not let the worker invent the product direction.
 
 ## Multi-Slice Batch Workflow
@@ -94,12 +124,13 @@ Slice 2
 
 Rules:
 
-- propose up to 4 slices at once
+- propose up to 4 slices by default, or up to 5 when the human explicitly asks for a 5-slice batch
 - mark which slices are implementation, guard/test, docs, or read-only audit
 - choose the model from HR history for each slice
 - ask the human before any slice that contains a big decision
 - run edit-capable workers one at a time in the shared worktree
 - do not start the next edit slice until Codex has reviewed, tested, and either accepted or rejected the previous slice
+- if a slice scores 7/10 or below, pause the batch and write the failure review before continuing
 - read-only audits may be batched more freely, but their findings still need Codex verification before implementation
 - after each accepted worker slice, update CodeLens handoff/docs and Pi HR if it was a real model evaluation
 
@@ -262,6 +293,7 @@ Medium:
 - mostly correct but leaves naming mess, weak docs, or small missed assertions
 - needs reviewer cleanup
 - safe for very small slices only
+- a score of 7/10 or below triggers a pause-and-review gate before more slices are assigned
 
 Bad:
 - touches forbidden files
@@ -356,9 +388,10 @@ Qwen 3.6 Plus:
 - Result on tiny `GraphLegend` title profile-label slice: strong, 9/10; needed only one redundant profile accessor cleanup.
 - Result on ontology correction evidence groundwork slice: strong, 8/10; stayed domain-only and scoped, but Codex fixed `reason` from required nullable to optional nullable and added the omitted-reason test.
 - Result on profile overlay composition helper slice: strong, 8/10; stayed scoped and verified, but Codex fixed personal overlay precedence, nested partial override typing/tests, deep-clone behavior, and minor test/doc cleanup.
+- Result on active-profile ontology helper seam tests: strong, 8/10; code and tests were scoped and useful, but final-report arithmetic drifted across historical suite counts.
 - Preserved `conceptTypes` as a compatibility alias while adding preferred `typeNodeIds`.
 - Followed TypeScript payload rename through codecs, row mappers, formatters, tests, and necessary downstream consumers.
-- Good candidate for medium compatibility-preserving API/payload rename slices, tiny/small strict profile-label wiring tickets, small TypeScript domain-shape/validation-helper groundwork, and small/medium internal profile/core composition helpers. Prompt composition tasks with explicit precedence, nested partial override, and deep-clone checks.
+- Good candidate for medium compatibility-preserving API/payload rename slices, tiny/small strict profile-label wiring tickets, small TypeScript domain-shape/validation-helper groundwork, small/medium internal profile/core composition helpers, and small active-profile helper seam tests. Prompt composition tasks with explicit precedence, nested partial override, and deep-clone checks. Verify final-report test-count arithmetic from command output.
 
 MiniMax M 2.7:
 - Result on `TypeNodeChip` UI primitive rename slice: medium.
@@ -378,7 +411,8 @@ GLM 5.1:
 - Result on ontology-profile naming boundary architecture guards: strong.
 - Added precise source-level guards and anti-regression docs without globally banning legacy names.
 - Needed only a one-word documentation typo fix.
-- Good candidate for architecture guard and anti-regression documentation slices.
+- Result on Batch 3 doc sync: useful, 8/10; captured the right current state and verification, but left one stale changed-file entry for Codex to remove.
+- Good candidate for architecture guard, anti-regression documentation, and handoff/doc-sync slices. Always verify changed-file lists against `git diff --name-only`.
 
 Kimi K2.6:
 - Result on `ConceptListFilters.typeNodeIds` compatibility alias slice: strong.
@@ -388,6 +422,8 @@ Kimi K2.6:
 - Result on Learning UI helper-label/nested flashback slice: strong, 9/10.
 - Result on graph helper-label nested `GraphProfile` slice: strong, 8/10; needed one handoff count correction.
 - Result on dynamic/fallback label wiring slice: medium, 7/10; required a reviewer production fix because count labels reused capitalized generic labels where the old UI rendered lowercase words.
+- Result on correction validation against composed profiles: strong, 9/10; exact requested tests and full verification after continuation confirmation.
+- Result on `overrideOntology` composition coverage: strong, 9/10; exact requested tests and full verification, with only a fixture wording cleanup by Codex.
 - Followed a strict bounded ticket prompt with explicit files, compatibility aliases, rg summary, TypeScript, targeted tests, and full suite.
 - Usually keeps scope well, but dynamic/pluralized UI text needs explicit rendered-output checks for singular and plural cases.
 - Good candidate for future compatibility-alias refactors, profile-label wiring, and small/medium TypeScript UI/API cleanup slices when given a professional bounded ticket.

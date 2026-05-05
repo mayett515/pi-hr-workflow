@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pi Model HR Visualization</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --panel-2: #20242d;
+      --panel-3: #282e39;
+      --text: #eef2f6;
+      --muted: #9da8b7;
+      --line: #303744;
+      --blue: #6bb7ff;
+      --green: #55d688;
+      --yellow: #f1c84b;
+      --red: #f27b83;
+      --teal: #5bd7cf;
+      --violet: #b99cff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.35;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      background: #0b0d11;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button,
+    .file-label {
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: var(--panel-2);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:hover,
+    .file-label:hover {
+      border-color: var(--blue);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 360px;
+      min-height: calc(100vh - 74px);
+    }
+
+    aside,
+    main,
+    .detail {
+      padding: 16px;
+      overflow: auto;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: #11141a;
+    }
+
+    .detail {
+      border-left: 1px solid var(--line);
+      background: #11141a;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 9px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric,
+    .section,
+    .model-card,
+    .eval-row {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+    }
+
+    .metric {
+      padding: 12px;
+      min-height: 76px;
+    }
+
+    .metric .value {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .metric .name {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .model-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .model-card {
+      padding: 12px;
+    }
+
+    .model-card.selected {
+      border-color: var(--blue);
+      background: var(--panel-2);
+    }
+
+    .model-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .model-name {
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .model-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .score {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--green);
+    }
+
+    .bar {
+      height: 8px;
+      background: #0d1015;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+      border: 1px solid #242b35;
+    }
+
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--red), var(--yellow), var(--green));
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .chip {
+      border: 1px solid rgba(107, 183, 255, .25);
+      color: var(--blue);
+      background: rgba(107, 183, 255, .08);
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .chip.risk {
+      color: var(--red);
+      border-color: rgba(242, 123, 131, .28);
+      background: rgba(242, 123, 131, .08);
+    }
+
+    .chip.rating-strong {
+      color: var(--green);
+      border-color: rgba(85, 214, 136, .28);
+      background: rgba(85, 214, 136, .08);
+    }
+
+    .chip.rating-medium {
+      color: var(--yellow);
+      border-color: rgba(241, 200, 75, .28);
+      background: rgba(241, 200, 75, .08);
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+    }
+
+    .eval-row {
+      display: grid;
+      grid-template-columns: 90px minmax(0, 1fr) 48px;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .eval-row:hover,
+    .eval-row.selected {
+      border-color: var(--blue);
+      background: var(--panel-2);
+    }
+
+    .eval-date {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .eval-task {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .eval-model {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .eval-score {
+      text-align: right;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 8px;
+    }
+
+    .heat-cell {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 7px;
+      padding: 8px;
+      min-height: 64px;
+    }
+
+    .heat-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .heat-tag {
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .heat-count {
+      color: var(--muted);
+    }
+
+    .mini-bars {
+      display: flex;
+      gap: 3px;
+      height: 18px;
+      align-items: end;
+    }
+
+    .mini-bars span {
+      width: 8px;
+      background: var(--teal);
+      border-radius: 2px 2px 0 0;
+      min-height: 2px;
+    }
+
+    .detail-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .detail-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+
+    .detail-section {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    .detail-section h3 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      color: #d8dee7;
+      font-size: 13px;
+    }
+
+    .empty {
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .error {
+      color: var(--red);
+      background: rgba(242, 123, 131, .08);
+      border: 1px solid rgba(242, 123, 131, .25);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .svg-chart {
+      width: 100%;
+      height: 220px;
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #11141a;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 270px minmax(0, 1fr);
+      }
+
+      .detail {
+        grid-column: 1 / -1;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        position: static;
+        display: block;
+      }
+
+      .header-actions {
+        justify-content: flex-start;
+        margin-top: 12px;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      aside,
+      .detail {
+        border: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Pi Model HR Visualization</h1>
+      <div class="subtitle" id="sourceLabel">Loading model_hr_db.json...</div>
+    </div>
+    <div class="header-actions">
+      <label class="file-label">
+        Load JSON
+        <input type="file" id="fileInput" accept=".json,application/json" />
+      </label>
+      <button id="resetFilters" type="button">Reset Filters</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="controls">
+        <label>
+          Search
+          <input id="searchInput" type="search" placeholder="model, task, tag, miss..." />
+        </label>
+        <label>
+          Model
+          <select id="modelFilter"></select>
+        </label>
+        <label>
+          Rating
+          <select id="ratingFilter">
+            <option value="">All ratings</option>
+            <option value="strong">Strong</option>
+            <option value="medium">Medium</option>
+            <option value="weak">Weak</option>
+            <option value="dangerous">Dangerous</option>
+          </select>
+        </label>
+        <label>
+          Tag
+          <select id="tagFilter"></select>
+        </label>
+      </div>
+      <div class="section">
+        <div class="section-head">
+          <h2>Risk Tags</h2>
+          <span class="hint" id="riskCount"></span>
+        </div>
+        <div class="chips" id="riskTags"></div>
+      </div>
+      <div class="section">
+        <div class="section-head">
+          <h2>Top Skills</h2>
+          <span class="hint">click to filter</span>
+        </div>
+        <div class="chips" id="skillTags"></div>
+      </div>
+    </aside>
+
+    <main>
+      <div id="loadError"></div>
+      <div class="metric-grid" id="metrics"></div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Model Scoreboard</h2>
+          <span class="hint" id="modelCount"></span>
+        </div>
+        <div class="model-list" id="modelList"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Score Timeline</h2>
+          <span class="hint">latest evaluations first</span>
+        </div>
+        <svg class="svg-chart" id="timelineChart" role="img" aria-label="Score timeline"></svg>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Tag Heatmap</h2>
+          <span class="hint">general coding tags</span>
+        </div>
+        <div class="heatmap" id="tagHeatmap"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>Evaluations</h2>
+          <span class="hint" id="evalCount"></span>
+        </div>
+        <div class="timeline" id="evalList"></div>
+      </div>
+    </main>
+
+    <section class="detail" id="detail"></section>
+  </div>
+
+  <script>
+    const state = {
+      db: null,
+      filtered: [],
+      selectedId: null,
+      selectedModel: "",
+      selectedTag: "",
+    };
+
+    const els = {
+      sourceLabel: document.getElementById("sourceLabel"),
+      fileInput: document.getElementById("fileInput"),
+      resetFilters: document.getElementById("resetFilters"),
+      searchInput: document.getElementById("searchInput"),
+      modelFilter: document.getElementById("modelFilter"),
+      ratingFilter: document.getElementById("ratingFilter"),
+      tagFilter: document.getElementById("tagFilter"),
+      riskTags: document.getElementById("riskTags"),
+      skillTags: document.getElementById("skillTags"),
+      riskCount: document.getElementById("riskCount"),
+      loadError: document.getElementById("loadError"),
+      metrics: document.getElementById("metrics"),
+      modelCount: document.getElementById("modelCount"),
+      modelList: document.getElementById("modelList"),
+      timelineChart: document.getElementById("timelineChart"),
+      tagHeatmap: document.getElementById("tagHeatmap"),
+      evalCount: document.getElementById("evalCount"),
+      evalList: document.getElementById("evalList"),
+      detail: document.getElementById("detail"),
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function uniq(items) {
+      return [...new Set(items.filter(Boolean))];
+    }
+
+    function allText(ev) {
+      return [
+        ev.id,
+        ev.model,
+        ev.task,
+        ev.slice,
+        ev.rating,
+        ev.outcome,
+        ...(ev.tags || []),
+        ...(ev.projectTags || []),
+        ...(ev.stackTags || []),
+        ...(ev.generalCodingTags || []),
+        ...(ev.riskTags || []),
+        ...(ev.strengths || []),
+        ...(ev.misses || []),
+        ...(ev.reviewerFixes || []),
+        ...(ev.recommendedUse || []),
+        ...(ev.avoidFor || []),
+      ].join(" ").toLowerCase();
+    }
+
+    function scoreColor(score) {
+      if (score >= 8.5) return "var(--green)";
+      if (score >= 7) return "var(--yellow)";
+      return "var(--red)";
+    }
+
+    function ratingClass(rating) {
+      return `chip rating-${String(rating || "medium").toLowerCase()}`;
+    }
+
+    function loadDb(db, source) {
+      state.db = db;
+      state.selectedId = db.evaluations.at(-1)?.id || db.evaluations[0]?.id || null;
+      els.sourceLabel.textContent = `${source} - ${db.evaluations.length} evaluations`;
+      els.loadError.innerHTML = "";
+      buildFilters();
+      render();
+    }
+
+    async function fetchDb() {
+      try {
+        const response = await fetch("model_hr_db.json", { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        loadDb(await response.json(), "model_hr_db.json");
+      } catch (error) {
+        els.sourceLabel.textContent = "Could not auto-load model_hr_db.json";
+        els.loadError.innerHTML = `<div class="error">Open this dashboard through a local server in C:\\pi-stuff, or use Load JSON and select model_hr_db.json. Browser detail: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function buildFilters() {
+      const evaluations = state.db.evaluations;
+      const models = uniq(evaluations.map((ev) => ev.model)).sort();
+      const tags = uniq(evaluations.flatMap((ev) => [
+        ...(ev.tags || []),
+        ...(ev.generalCodingTags || []),
+        ...(ev.stackTags || []),
+        ...(ev.riskTags || []),
+      ])).sort();
+
+      els.modelFilter.innerHTML = `<option value="">All models</option>${models.map((m) => `<option>${escapeHtml(m)}</option>`).join("")}`;
+      els.tagFilter.innerHTML = `<option value="">All tags</option>${tags.map((t) => `<option>${escapeHtml(t)}</option>`).join("")}`;
+    }
+
+    function filteredEvaluations() {
+      if (!state.db) return [];
+      const query = els.searchInput.value.trim().toLowerCase();
+      const model = els.modelFilter.value;
+      const rating = els.ratingFilter.value;
+      const tag = els.tagFilter.value;
+
+      return state.db.evaluations.filter((ev) => {
+        const allTags = [
+          ...(ev.tags || []),
+          ...(ev.projectTags || []),
+          ...(ev.stackTags || []),
+          ...(ev.generalCodingTags || []),
+          ...(ev.riskTags || []),
+        ];
+        if (model && ev.model !== model) return false;
+        if (rating && ev.rating !== rating) return false;
+        if (tag && !allTags.includes(tag)) return false;
+        if (query && !allText(ev).includes(query)) return false;
+        return true;
+      });
+    }
+
+    function groupByModel(evaluations) {
+      const map = new Map();
+      for (const ev of evaluations) {
+        if (!map.has(ev.model)) {
+          map.set(ev.model, {
+            model: ev.model,
+            count: 0,
+            avg: 0,
+            latest: null,
+            strong: 0,
+            medium: 0,
+            tags: [],
+            risks: [],
+            evals: [],
+          });
+        }
+        const item = map.get(ev.model);
+        item.count += 1;
+        item.avg += Number(ev.score || 0);
+        item.strong += ev.rating === "strong" ? 1 : 0;
+        item.medium += ev.rating === "medium" ? 1 : 0;
+        item.latest = !item.latest || ev.date >= item.latest.date ? ev : item.latest;
+        item.tags.push(...(ev.generalCodingTags || []), ...(ev.tags || []));
+        item.risks.push(...(ev.riskTags || []));
+        item.evals.push(ev);
+      }
+      return [...map.values()]
+        .map((item) => ({ ...item, avg: item.avg / item.count, tags: uniq(item.tags), risks: uniq(item.risks) }))
+        .sort((a, b) => b.avg - a.avg || b.count - a.count);
+    }
+
+    function counts(items) {
+      const map = new Map();
+      for (const item of items) map.set(item, (map.get(item) || 0) + 1);
+      return [...map.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    }
+
+    function renderMetrics(evaluations) {
+      const models = uniq(evaluations.map((ev) => ev.model));
+      const avg = evaluations.length ? evaluations.reduce((sum, ev) => sum + Number(ev.score || 0), 0) / evaluations.length : 0;
+      const strong = evaluations.filter((ev) => ev.rating === "strong").length;
+      const latest = [...evaluations].sort((a, b) => String(b.date).localeCompare(String(a.date)))[0];
+
+      const data = [
+        ["Evaluations", evaluations.length],
+        ["Models", models.length],
+        ["Average Score", avg.toFixed(1)],
+        ["Strong Share", evaluations.length ? `${Math.round((strong / evaluations.length) * 100)}%` : "0%"],
+      ];
+
+      els.metrics.innerHTML = data.map(([name, value]) => `
+        <div class="metric">
+          <div class="value">${escapeHtml(value)}</div>
+          <div class="name">${escapeHtml(name)}</div>
+        </div>
+      `).join("");
+
+      if (latest) {
+        els.metrics.innerHTML += `
+          <div class="metric" style="grid-column: 1 / -1; min-height: 0;">
+            <div class="name">Latest in filter</div>
+            <div style="font-weight: 700; margin-top: 4px;">${escapeHtml(latest.model)} - ${escapeHtml(latest.task)}</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderModelList(evaluations) {
+      const models = groupByModel(evaluations);
+      els.modelCount.textContent = `${models.length} shown`;
+      els.modelList.innerHTML = models.map((item) => `
+        <div class="model-card ${state.selectedModel === item.model ? "selected" : ""}" data-model="${escapeHtml(item.model)}">
+          <div class="model-head">
+            <div>
+              <div class="model-name">${escapeHtml(item.model)}</div>
+              <div class="model-meta">${item.count} evals - ${item.strong} strong - ${item.medium} medium</div>
+            </div>
+            <div class="score" style="color: ${scoreColor(item.avg)}">${item.avg.toFixed(1)}</div>
+          </div>
+          <div class="bar"><span style="width: ${Math.max(0, Math.min(100, item.avg * 10))}%"></span></div>
+          <div class="chips">
+            ${item.tags.slice(0, 5).map((tag) => `<span class="chip" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join("")}
+            ${item.risks.slice(0, 3).map((tag) => `<span class="chip risk" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+        </div>
+      `).join("") || `<div class="empty">No models match the current filters.</div>`;
+    }
+
+    function renderTimelineChart(evaluations) {
+      const data = [...evaluations].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      const width = 900;
+      const height = 220;
+      const pad = 30;
+      const step = data.length > 1 ? (width - pad * 2) / (data.length - 1) : 0;
+      const points = data.map((ev, index) => {
+        const score = Number(ev.score || 0);
+        return {
+          ev,
+          x: data.length > 1 ? pad + index * step : width / 2,
+          y: height - pad - (score / 10) * (height - pad * 2),
+          color: scoreColor(score),
+        };
+      });
+
+      const axis = [0, 5, 10].map((score) => {
+        const y = height - pad - (score / 10) * (height - pad * 2);
+        return `<line x1="${pad}" y1="${y}" x2="${width - pad}" y2="${y}" stroke="#28303b" /><text x="6" y="${y + 4}" fill="#9da8b7" font-size="11">${score}</text>`;
+      }).join("");
+
+      const circles = points.map((p) => `
+        <g class="chart-point" data-id="${escapeHtml(p.ev.id)}" style="cursor:pointer">
+          <circle cx="${p.x}" cy="${p.y}" r="6" fill="${p.color}" />
+          <title>${escapeHtml(p.ev.model)} - ${escapeHtml(p.ev.task)} - ${p.ev.score}/10</title>
+        </g>
+      `).join("");
+
+      const line = points.length > 1
+        ? `<polyline fill="none" stroke="var(--blue)" stroke-width="2" opacity=".45" points="${points.map((p) => `${p.x},${p.y}`).join(" ")}" />`
+        : "";
+
+      els.timelineChart.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      els.timelineChart.innerHTML = `${axis}${line}${circles}`;
+    }
+
+    function renderTags(evaluations) {
+      const skillCounts = counts(evaluations.flatMap((ev) => ev.generalCodingTags || []));
+      const riskCounts = counts(evaluations.flatMap((ev) => ev.riskTags || []));
+
+      els.skillTags.innerHTML = skillCounts.slice(0, 18).map(([tag, count]) => `<span class="chip" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)} ${count}</span>`).join("");
+      els.riskTags.innerHTML = riskCounts.slice(0, 18).map(([tag, count]) => `<span class="chip risk" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)} ${count}</span>`).join("");
+      els.riskCount.textContent = `${riskCounts.length} risk tags`;
+
+      els.tagHeatmap.innerHTML = skillCounts.slice(0, 24).map(([tag, count]) => {
+        const related = evaluations.filter((ev) => (ev.generalCodingTags || []).includes(tag));
+        const heights = related.slice(-8).map((ev) => Math.max(2, Number(ev.score || 0) * 1.7));
+        return `
+          <div class="heat-cell">
+            <div class="heat-top">
+              <span class="heat-tag">${escapeHtml(tag)}</span>
+              <span class="heat-count">${count}</span>
+            </div>
+            <div class="mini-bars">${heights.map((h) => `<span style="height:${h}px"></span>`).join("")}</div>
+          </div>
+        `;
+      }).join("") || `<div class="empty">No tag data for current filters.</div>`;
+    }
+
+    function renderEvalList(evaluations) {
+      const rows = [...evaluations].reverse();
+      els.evalCount.textContent = `${rows.length} shown`;
+      els.evalList.innerHTML = rows.map((ev) => `
+        <div class="eval-row ${state.selectedId === ev.id ? "selected" : ""}" data-id="${escapeHtml(ev.id)}">
+          <div class="eval-date">${escapeHtml(ev.date)}</div>
+          <div>
+            <div class="eval-task">${escapeHtml(ev.task)}</div>
+            <div class="eval-model">${escapeHtml(ev.model)} - ${escapeHtml(ev.rating)}</div>
+          </div>
+          <div class="eval-score" style="color:${scoreColor(Number(ev.score || 0))}">${escapeHtml(ev.score)}</div>
+        </div>
+      `).join("") || `<div class="empty">No evaluations match the current filters.</div>`;
+    }
+
+    function list(items) {
+      if (!items || !items.length) return `<div class="hint">None recorded.</div>`;
+      return `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+    }
+
+    function renderDetail(evaluations) {
+      const selected = evaluations.find((ev) => ev.id === state.selectedId) || evaluations.at(-1) || state.db?.evaluations.at(-1);
+      if (!selected) {
+        els.detail.innerHTML = `<div class="empty">Select an evaluation.</div>`;
+        return;
+      }
+      state.selectedId = selected.id;
+      const tags = uniq([...(selected.tags || []), ...(selected.generalCodingTags || []), ...(selected.riskTags || [])]);
+
+      els.detail.innerHTML = `
+        <div class="detail-title">${escapeHtml(selected.model)}</div>
+        <div class="detail-meta">${escapeHtml(selected.date)} - ${escapeHtml(selected.task)} - score ${escapeHtml(selected.score)}/10 - ${escapeHtml(selected.rating)}</div>
+        <div class="chips">
+          ${tags.map((tag) => `<span class="chip ${(selected.riskTags || []).includes(tag) ? "risk" : ""}" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</span>`).join("")}
+        </div>
+        <div class="detail-section">
+          <h3>Outcome</h3>
+          <div class="hint">${escapeHtml(selected.outcome || selected.slice || "")}</div>
+        </div>
+        <div class="detail-section">
+          <h3>Strengths</h3>
+          ${list(selected.strengths)}
+        </div>
+        <div class="detail-section">
+          <h3>Misses</h3>
+          ${list(selected.misses)}
+        </div>
+        <div class="detail-section">
+          <h3>Reviewer Fixes</h3>
+          ${list(selected.reviewerFixes)}
+        </div>
+        <div class="detail-section">
+          <h3>Recommended Use</h3>
+          ${list(selected.recommendedUse)}
+        </div>
+        <div class="detail-section">
+          <h3>Avoid For</h3>
+          ${list(selected.avoidFor)}
+        </div>
+      `;
+    }
+
+    function render() {
+      if (!state.db) return;
+      const evaluations = filteredEvaluations();
+      state.filtered = evaluations;
+      if (evaluations.length && !evaluations.some((ev) => ev.id === state.selectedId)) {
+        state.selectedId = evaluations.at(-1).id;
+      }
+      renderMetrics(evaluations);
+      renderModelList(evaluations);
+      renderTimelineChart(evaluations);
+      renderTags(evaluations);
+      renderEvalList(evaluations);
+      renderDetail(evaluations);
+    }
+
+    function setTag(tag) {
+      els.tagFilter.value = tag;
+      render();
+    }
+
+    document.addEventListener("click", (event) => {
+      const tag = event.target.closest("[data-tag]")?.getAttribute("data-tag");
+      const model = event.target.closest("[data-model]")?.getAttribute("data-model");
+      const rowId = event.target.closest("[data-id]")?.getAttribute("data-id");
+      const chartId = event.target.closest(".chart-point")?.getAttribute("data-id");
+      if (tag) setTag(tag);
+      if (model) {
+        els.modelFilter.value = model;
+        state.selectedModel = model;
+        render();
+      }
+      if (rowId || chartId) {
+        state.selectedId = rowId || chartId;
+        render();
+      }
+    });
+
+    [els.searchInput, els.modelFilter, els.ratingFilter, els.tagFilter].forEach((el) => {
+      el.addEventListener("input", () => {
+        state.selectedModel = els.modelFilter.value;
+        render();
+      });
+    });
+
+    els.resetFilters.addEventListener("click", () => {
+      els.searchInput.value = "";
+      els.modelFilter.value = "";
+      els.ratingFilter.value = "";
+      els.tagFilter.value = "";
+      state.selectedModel = "";
+      render();
+    });
+
+    els.fileInput.addEventListener("change", async () => {
+      const file = els.fileInput.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      loadDb(JSON.parse(text), file.name);
+    });
+
+    fetchDb();
+  </script>
+</body>
+</html>

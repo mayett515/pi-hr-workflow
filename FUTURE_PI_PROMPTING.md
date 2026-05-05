@@ -252,7 +252,8 @@ Record prompt improvements in the evaluation. Future prompts should reuse those 
 When Codex delegates a worker slice through the local Pi CLI, prefer non-interactive mode with a saved prompt file:
 
 ```powershell
-pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+$prompt = Get-Content -Raw C:\pi-stuff\prompts\<ticket>.md
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools "read,grep,find,ls,edit,bash" --mode json -p $prompt
 ```
 
 Use exact model ids when possible:
@@ -260,8 +261,22 @@ Use exact model ids when possible:
 ```powershell
 pi --list-models qwen
 pi --list-models opencode-go
-pi --model opencode-go/qwen3.6-plus --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+pi --model opencode-go/qwen3.6-plus --thinking high --session-dir C:\pi-stuff\sessions --tools "read,grep,find,ls,edit,bash" --mode json -p $prompt
 ```
+
+Always set `PI_PERMISSION_LEVEL=high` in the launching shell before invoking Pi for an HR worker run. Lower levels silently block edit/bash tool calls so the slice exits 0 with no diff. The HR ticket itself bounds the worker; the runtime permission level should not.
+
+```powershell
+$env:PI_PERMISSION_LEVEL = 'high'
+```
+
+```bash
+export PI_PERMISSION_LEVEL=high
+```
+
+On Windows PowerShell 5.1, do not pipe Pi `--mode json` output through `Tee-Object` - it can deadlock the run. Use Git Bash with `> file 2>&1` redirection, or rely on Pi's `--session-dir`.
+
+Local setup note: keep full `npm:mitsupi` installed, but disable only `extensions/go-to-bed.ts` in Mitsupi's package manifest. Current smoke test passed without `--no-extensions` after that change. If a package update restores the quiet-hours/go-to-bed extension and it blocks a non-interactive worker after the human explicitly asked to continue, do not score the initial refusal as a model failure. Disable only that extension again, or use `--no-extensions` as a temporary fallback while keeping `PI_PERMISSION_LEVEL=high`, `--thinking high`, `--mode json`, and the normal tool allowlist.
 
 Here `opencode-go/...` is the OpenCode model provider inside Pi. Do not use the separate `opencode` CLI for this HR workflow.
 
@@ -270,8 +285,10 @@ Interactive `/model` or TUI selection is fine when the human drives Pi, but Code
 Use read-only tools for audits:
 
 ```powershell
-pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls -p @C:\pi-stuff\prompts\<ticket>.md
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools "read,grep,find,ls" --mode json -p $prompt
 ```
+
+For real HR worker runs, always use `--thinking high`; do not score low-thinking syntax probes. On Windows PowerShell, quote the comma-separated `--tools` value. Prefer passing prompt text from `Get-Content -Raw` into `-p $prompt`; do not rely on `-p @prompt.md` for scored Codex-run HR work because `@file` behaves like attached context and can make the worker instruction/result harder to audit.
 
 Do not ask Pi to make product decisions. Worker prompts should say:
 
@@ -326,6 +343,15 @@ Blocked decisions:
 
 Run edit-capable Pi slices sequentially in the shared worktree. A failed slice should be reviewed and either repaired, rejected, or re-ticketed before the next edit worker starts.
 
+If any real worker evaluation scores 7/10 or below, pause the batch before launching the next edit-capable slice. Codex must write a failure review first:
+
+- what went wrong
+- whether it was model behavior, prompt design, task choice, or reviewer cleanup
+- what was rejected, trimmed, repaired, or accepted with caveats
+- what prompt rule or model-assignment rule changes follow from it
+
+Promote the lesson into HR before continuing. This prevents a weak pattern from silently propagating through the rest of a multi-slice batch.
+
 ## Current Best Practices From Trials
 
 - Add an explicit `rg` audit for naming slices.
@@ -348,5 +374,15 @@ Run edit-capable Pi slices sequentially in the shared worktree. A failed slice s
 - For pure merge helpers, require deep-clone/no-shared-reference checks for nested maps, arrays, and option objects, not only input snapshot equality.
 - Ban `as any` in worker tests unless the final report explicitly justifies why it is needed.
 - Ask workers to keep docs and test comments ASCII-only unless the target file already requires non-ASCII text.
+- When new files are in scope, explicitly require workers to use the `edit` tool for file creation rather than shell redirection or `cat > file`; shell-created files can be correct but are less auditable.
+- For TypeScript helper/refactor slices, require a final self-check for unused imports in touched files even when `tsc` passes.
 - For test-only guard tasks, require the final report to separate the actual number of new `it(...)` test blocks from the number of logical assertions covered inside those tests.
 - Ask guard-test workers to describe residual risk accurately: source-level guards prevent specific regressions, but they do not prove future persistence/UI behavior is complete or risk-free.
+- For doc-anchor guard tasks, cap the expected number of tests and anchors. Guard the durable section identity and a small number of core phrases, not every sentence in the doc.
+- For doc-anchor follow-up batches, pre-supply the exact `.toContain(...)` literal strings in the prompt so the worker cannot drift on anchor selection (validated by the GLM 5.1 doc 06 slice).
+- When stating before/after test counts in a prompt, frame the baseline as approximate (`add exactly N new tests; baseline is approximately M`) rather than absolute. A misstated absolute count can pull a faithful worker toward padding to hit the stated total. (Validated by the Kimi K2.6 composition-mixed-kind slice, where the prompt said 21 -> 24 but the actual baseline was 17; the worker correctly added the requested 3 tests and noted the discrepancy.)
+- For test fixtures that compare against the base profile via fallthrough assertions, pre-check that the fixture value differs from the base profile default. Otherwise the assertion can pass even if the overlay was ignored. (Validated by the DeepSeek V4 Pro active-profile seam slice, where the worker self-corrected a `Learning Hub` overlay value that equalled `codingProfile.labels.hubTitle` and was therefore non-diagnostic.)
+- Require the worker to print exit codes / pass-fail counts of verification commands directly in the final report. Do not let the worker self-report "blocked" or "could not run" without a concrete error message; otherwise the reviewer ends up running every verification step independently.
+- For doc-sync tasks that update "current changed files", require an explicit `git diff --name-only` cross-check. Doc models can preserve stale file entries from an older batch even when the rest of the doc update is correct.
+- For Qwen 3.6 Plus final reports, verify test-count arithmetic from command output. It can produce good code while briefly mixing historical and current suite counts in narrative text.
+- Pause after any worker score of 7/10 or below. Review the failure mode, update HR/prompt rules, and only then continue the batch.

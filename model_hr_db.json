@@ -2396,6 +2396,1542 @@
         "watch-deep-clone-reference-sharing",
         "avoid-persistence-without-review"
       ]
+    },
+    {
+      "id": "2026-05-05-qwen-3-6-plus-profile-composition-reference-tests",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi CLI (opencode-go)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded test-only ticket",
+      "taskType": "profile-composition-deep-clone-tests",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "C:/pi-stuff/FUTURE_PI_PROMPTING.md",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts",
+        "src/features/ontology/profiles/codingProfile.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit single test file",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Qwen can add focused deep-clone/no-shared-reference regression tests for an existing pure composition helper without editing production code.",
+      "promptAdaptationNotes": [
+        "Qwen handled a strict test-only composition-helper ticket well at high thinking.",
+        "Keep the no-production-edit rule explicit for tests that may reveal real clone bugs.",
+        "Continue requiring no as-any and required rg checks for TypeScript test slices."
+      ],
+      "task": "Profile composition deep-clone reference tests",
+      "slice": "Add tests proving composeDomainProfile returns cloned graph maps, ontology nodes, node arrays, overlay-added nodes, boundary-rule evidence arrays, and metadata enum option objects without sharing mutable input references.",
+      "difficulty": "small-test-only-guard",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after Codex review with no code changes. Worker stayed scoped and the final targeted test file passed 17/17.",
+      "filesChanged": [
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "strengths": [
+        "Stayed inside the single allowed test file.",
+        "Added no production code and did not touch docs, DB, UI, persistence, MCP, Racket, or adapters.",
+        "Covered the requested deep-clone/no-shared-reference cases thoroughly.",
+        "Ran TypeScript, targeted tests, and required rg searches.",
+        "Kept tests free of as-any casts."
+      ],
+      "projectSpecificStrengths": [
+        "Reinforced the Kortex overlay composition seam without advancing persistence or activation state.",
+        "Protected profile overlay immutability before future branch/adapter work relies on it.",
+        "Kept current codingProfile behavior as the base runtime profile."
+      ],
+      "generalizedStackStrengths": [
+        "Good at TypeScript/Vitest test additions around pure helper behavior.",
+        "Can write reference-equality assertions for cloned nested config structures.",
+        "Handles strict test-only scope in a React Native/TypeScript repo."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong scope control on a focused test-only slice.",
+        "Good at deep-clone immutability test coverage.",
+        "Good final reporting when given strict required sections."
+      ],
+      "misses": [
+        "Added more test volume than the minimum, so reviewer still checked readability and brittleness.",
+        "Pi raw log included terminal notification noise; this was runner/tooling noise, not a model code miss."
+      ],
+      "reviewerFixes": [
+        "No source or test edits were required after Qwen.",
+        "Codex reran TypeScript, targeted tests, rg no-as-any search, and included the slice in final full-suite verification."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: clean",
+        "npm test -- --run src/features/ontology/__tests__/profileComposition.test.ts: 17/17 passed",
+        "Focused final batch tests: 63/63 passed across 3 files",
+        "Full final suite: 402/402 passed across 52 files",
+        "rg -n \"as any\" in changed test files: no matches"
+      ],
+      "recommendedUse": [
+        "Strict test-only composition-helper guard slices.",
+        "Deep-clone/no-shared-reference tests for pure merge helpers.",
+        "TypeScript/Vitest domain utility test hardening."
+      ],
+      "avoidFor": [
+        "Persistence, migrations, backup/import/export, or restore implementation.",
+        "Product or relationship-semantics decisions.",
+        "Unbounded architecture work."
+      ],
+      "promptImprovements": [
+        "Keep no-production-edit instructions explicit when a failing test may reveal a real bug.",
+        "Require reference-identity checks for each nested mutable field named in the ticket.",
+        "Use high thinking and JSON-mode Pi logs for scored HR runs."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "profile-composition",
+        "deep-clone-immutability",
+        "test-only-guard",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "profile-overlays",
+        "kortex-core"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "regression-guarding",
+        "deep-clone-immutability",
+        "test-discipline",
+        "scope-control",
+        "bounded-refactor",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-product-decisions"
+      ]
+    },
+    {
+      "id": "2026-05-05-kimi-k2-6-active-profile-seam-tests",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi CLI (opencode-go)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded test-only ticket",
+      "taskType": "active-profile-seam-tests",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "C:/pi-stuff/FUTURE_PI_PROMPTING.md",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/__tests__/activeProfile.test.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit single test file",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi can harden an explicit runtime seam with narrow tests while keeping global active profile state out of scope.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 remains strong on narrow seam tests with explicit scope.",
+        "For mutation/no-cache tests, accept small type assertions when they are local and not as-any.",
+        "Keep active overlay persistence/global state explicitly forbidden."
+      ],
+      "task": "Active profile overlay seam tests",
+      "slice": "Add tests proving getActiveDomainProfile(overlays) gives personal overlay priority, returns separate composed runtime objects, does not share graph maps with codingProfile, and does not mutate overlay input.",
+      "difficulty": "small-test-only-guard",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after Codex review with no code changes. Worker stayed scoped and the activeProfile test file passed 8/8.",
+      "filesChanged": [
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "strengths": [
+        "Stayed inside the single allowed test file.",
+        "Covered personal overlay priority through the active-profile seam.",
+        "Added no-cache/separate-runtime-object coverage.",
+        "Added graph nested-map clone coverage and overlay-input no-mutation coverage.",
+        "Ran TypeScript, targeted tests, and required rg searches."
+      ],
+      "projectSpecificStrengths": [
+        "Protected the explicit overlay seam without introducing persistence, global active state, or UI activation.",
+        "Reinforced that getActiveDomainProfile remains caller-driven at this stage.",
+        "Kept codingProfile as the direct no-overlay runtime behavior."
+      ],
+      "generalizedStackStrengths": [
+        "Good at TypeScript/Vitest tests around exported seam behavior.",
+        "Handles test-only tickets in a feature-folder TypeScript repo.",
+        "Can test immutability and no-cache behavior cleanly."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong scope control.",
+        "Good seam-focused regression coverage.",
+        "Good reporting under strict prompt shape."
+      ],
+      "misses": [
+        "Used a local type assertion to mutate returned graph state for the no-cache assertion; it was harmless and not as-any, but still needed reviewer inspection."
+      ],
+      "reviewerFixes": [
+        "No source or test edits were required after Kimi.",
+        "Codex reran TypeScript, targeted tests, rg no-as-any search, and final full-suite verification."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: clean",
+        "npm test -- --run src/features/ontology/__tests__/activeProfile.test.ts: 8/8 passed",
+        "Focused final batch tests: 63/63 passed across 3 files",
+        "Full final suite: 402/402 passed across 52 files",
+        "rg -n \"as any\" in changed test files: no matches"
+      ],
+      "recommendedUse": [
+        "Small strict seam-test tickets.",
+        "Compatibility/profile behavior tests.",
+        "TypeScript UI/API cleanup slices with explicit boundaries."
+      ],
+      "avoidFor": [
+        "Persistence/backup/import/export work.",
+        "Big product or architecture decisions.",
+        "Dynamic UI text changes unless rendered singular/plural examples are required."
+      ],
+      "promptImprovements": [
+        "Keep explicit no-global-state and no-persistence constraints in active-profile prompts.",
+        "Ask final reports to call out any type assertions used for intentional mutation tests.",
+        "Keep high thinking and exact verification commands."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "active-profile",
+        "profile-overlays",
+        "test-only-guard",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "active-profile-seam"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "regression-guarding",
+        "compatibility-boundary",
+        "test-discipline",
+        "scope-control",
+        "bounded-refactor",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "avoid-persistence-without-review",
+        "avoid-product-decisions"
+      ]
+    },
+    {
+      "id": "2026-05-05-deepseek-v4-pro-future-runtime-source-guards",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "DeepSeek V4 Pro",
+      "runner": "Pi CLI (opencode-go)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "test-only guard",
+      "taskType": "future-runtime-source-guards",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/07_KORTEX_CORE_AND_CHILD_CORES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/08_KORTEX_LANGUAGE_LAYER_AND_ADAPTERS.md",
+        "ONTOLOGY_PROFILE_REFACTOR/09_KORTEX_OVER_EXISTING_SYSTEMS.md",
+        "src/__tests__/stage10-architecture-guards.test.ts",
+        "src/features/ontology/index.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit single test file",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether DeepSeek can add precise source-level guards that keep future Kortex runtime concepts out of production source until explicitly approved.",
+      "promptAdaptationNotes": [
+        "DeepSeek remains useful for source-level guard tests when the forbidden patterns are explicit.",
+        "Require exact reporting of new it-block counts versus logical guard categories.",
+        "Codex should verify rg reports because DeepSeek may over-explain or omit some pattern names from its summary."
+      ],
+      "task": "Future runtime source guard tests",
+      "slice": "Add stage10 guards banning hidden active overlay state, future agent/app operation names, and profile overlay persistence table/string names from production src code at this stage.",
+      "difficulty": "small-test-only-guard",
+      "allowedWriteScope": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after Codex review. Code was scoped and useful, but the final report overstated the number of new tests.",
+      "filesChanged": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "strengths": [
+        "Stayed inside the single allowed architecture guard test file.",
+        "Added precise source guards for active-profile mutable state names.",
+        "Added guards for future Kortex operation names under production src.",
+        "Added guards for profile overlay persistence table/string names under production src.",
+        "Ran TypeScript, targeted tests, and rg searches."
+      ],
+      "projectSpecificStrengths": [
+        "Preserved future agent/subagent, app-builder, MCP, adapter, and DSL ideas as docs-only architecture.",
+        "Protected the explicit overlay seam from hidden global active state.",
+        "Kept profile overlay persistence deferred until branch semantics and activation decisions are explicit."
+      ],
+      "generalizedStackStrengths": [
+        "Good at Vitest source guard additions in a TypeScript repo.",
+        "Can encode forbidden-name architecture constraints with filtered source scans.",
+        "Works well for one-file guard slices."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong source-guard implementation under a strict prompt.",
+        "Good scope control.",
+        "Needs reviewer verification for final-report counts."
+      ],
+      "misses": [
+        "Reported 21 new tests even though the actual addition was 16 new it-blocks.",
+        "Over-explained the required rg pattern mismatch around DefineAppEntity/DefineAppWorkflow instead of simply reporting the exact guard coverage."
+      ],
+      "reviewerFixes": [
+        "No code edits were required for the DeepSeek guard implementation.",
+        "Codex corrected the HR interpretation: 16 new guard tests, not 21.",
+        "Codex reran TypeScript, stage10 tests, required rg searches, and final full suite."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: clean",
+        "npm test -- --run src/__tests__/stage10-architecture-guards.test.ts: final 38/38 passed after all batch guard work",
+        "Focused final batch tests: 63/63 passed across 3 files",
+        "Full final suite: 402/402 passed across 52 files",
+        "rg future operation names/profile overlay table names/active overlay state: only expected guard-test hits or no matches"
+      ],
+      "recommendedUse": [
+        "Focused one-file source guard tests.",
+        "Architecture boundary guard hardening after implementation slices.",
+        "Regression guards for explicitly named forbidden patterns."
+      ],
+      "avoidFor": [
+        "Persistence or migration implementation.",
+        "Broad implementation slices.",
+        "Tasks where the final report must be trusted without Codex count verification."
+      ],
+      "promptImprovements": [
+        "Require final report to separate number of new it-blocks from number of guarded names.",
+        "State whether required rg patterns are examples or the complete forbidden-name list.",
+        "Keep write scope to one test file for this model."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "source-guards",
+        "stage10-guards",
+        "future-runtime-boundary",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "kortex-future-boundaries",
+        "stage10-guards"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "regression-guarding",
+        "source-guards",
+        "test-discipline",
+        "scope-control",
+        "bounded-refactor",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-reporting-counts",
+        "avoid-persistence-without-review",
+        "avoid-broad-implementation"
+      ]
+    },
+    {
+      "id": "2026-05-05-glm-5-1-anti-regression-future-boundaries",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "GLM 5.1",
+      "runner": "Pi CLI (opencode-go)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "architecture/doc guard",
+      "taskType": "anti-regression-doc-boundaries",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/07_KORTEX_CORE_AND_CHILD_CORES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/08_KORTEX_LANGUAGE_LAYER_AND_ADAPTERS.md",
+        "ONTOLOGY_PROFILE_REFACTOR/09_KORTEX_OVER_EXISTING_SYSTEMS.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md"
+      ],
+      "allowedWriteScopeStyle": "explicit single docs file",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether GLM can preserve future architecture ideas as anti-regression rules without inventing runtime implementation.",
+      "promptAdaptationNotes": [
+        "GLM 5.1 remains strong for concise architecture guardrail docs.",
+        "Keep docs-only and no-source-code boundaries explicit.",
+        "Require ASCII checks for documentation updates."
+      ],
+      "task": "Anti-regression future boundary docs",
+      "slice": "Add Kortex core boundary rules, future architecture guardrails, and refactor gates for agent/subagent execution, self-building apps, language/DSL, overlays over existing systems, and explicit-only active profile overlays.",
+      "difficulty": "small-docs-only-guard",
+      "allowedWriteScope": [
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after Codex review with no documentation edits required. The doc stayed scoped, concise, and ASCII-clean.",
+      "filesChanged": [
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md"
+      ],
+      "strengths": [
+        "Stayed inside the single allowed markdown file.",
+        "Added clear Kortex Core boundary rules and future architecture guardrails.",
+        "Added matching refactor gates for future runtime directions.",
+        "Kept agent/subagent, self-building app, Racket/DSL, overlay adapters, MCP, and active overlay persistence as future-only without implementation.",
+        "Kept text ASCII-clean."
+      ],
+      "projectSpecificStrengths": [
+        "Made the durable docs explain that CodeLens is a child core, not the Kortex system boundary.",
+        "Preserved the user-discussed agent execution ontology and self-building app framework as future architecture.",
+        "Reinforced that active overlays are explicit-only at this stage."
+      ],
+      "generalizedStackStrengths": [
+        "Good at architecture markdown hardening in a TypeScript project.",
+        "Can translate existing docs into anti-regression rules without touching source."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong docs-only scope control.",
+        "Good at concise guardrail language.",
+        "Good at matching docs to current implementation boundaries."
+      ],
+      "misses": [
+        "No substantive misses. Codex still verified ASCII and scope because docs workers often introduce non-ASCII punctuation."
+      ],
+      "reviewerFixes": [
+        "No doc edits were required after GLM.",
+        "Codex verified diff scope, rg guardrail hits, ASCII cleanliness, targeted tests, and full suite."
+      ],
+      "verification": [
+        "rg future boundary terms in 05_ANTI_REGRESSION_RULES.md: expected guardrail/gate hits present",
+        "Changed markdown file ASCII check: clean",
+        "Focused final batch tests: 63/63 passed across 3 files",
+        "Full final suite: 402/402 passed across 52 files"
+      ],
+      "recommendedUse": [
+        "Architecture guardrail documentation slices.",
+        "Anti-regression docs that summarize already-decided boundaries.",
+        "Docs-only hardening after implementation or planning sessions."
+      ],
+      "avoidFor": [
+        "Inventing product direction or runtime design.",
+        "Persistence/DB implementation.",
+        "Broad source edits."
+      ],
+      "promptImprovements": [
+        "Keep docs-only scope and explicit no-source-code constraints.",
+        "Require rg verification for the key future boundary terms.",
+        "Ask for ASCII-only text in docs unless the target file already requires non-ASCII."
+      ],
+      "usefulTools": [
+        "rg",
+        "git diff review",
+        "ASCII scan",
+        "targeted tests after docs guard integration"
+      ],
+      "tags": [
+        "architecture-docs",
+        "anti-regression-rules",
+        "future-boundaries",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "kortex-core",
+        "future-architecture"
+      ],
+      "stackTags": [
+        "markdown",
+        "typescript-project"
+      ],
+      "generalCodingTags": [
+        "scope-control",
+        "reporting",
+        "prompt-style-aware",
+        "regression-guarding"
+      ],
+      "riskTags": [
+        "avoid-product-invention",
+        "avoid-source-implementation"
+      ]
+    },
+    {
+      "id": "2026-05-05-mimo-v2-5-pro-doc-anchor-guards",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Mimo v2.5 Pro",
+      "runner": "Pi CLI (opencode-go)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "architecture/doc guard",
+      "taskType": "durable-doc-anchor-guards",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/07_KORTEX_CORE_AND_CHILD_CORES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/08_KORTEX_LANGUAGE_LAYER_AND_ADAPTERS.md",
+        "ONTOLOGY_PROFILE_REFACTOR/09_KORTEX_OVER_EXISTING_SYSTEMS.md",
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit single test file",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Mimo can add docs-aware architecture guards that keep future Kortex direction anchors visible without over-constraining markdown wording.",
+      "promptAdaptationNotes": [
+        "Mimo over-expanded the doc-anchor guard slice and needs a hard cap on number of tests/anchors for similar work.",
+        "For doc guards, specify the exact number of tests expected and say not to guard every section or sentence.",
+        "Keep ASCII-only comments explicit and verify after the run."
+      ],
+      "task": "Durable doc future-direction anchor guards",
+      "slice": "Add stage10 guard tests that read Kortex docs and assert the agent execution ontology, self-building app framework, future operation names, overlay direction, NEXT_LLM cautions, and anti-regression future guardrails remain present.",
+      "difficulty": "small-guard-test",
+      "allowedWriteScope": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "rating": "medium",
+      "score": 6,
+      "outcome": "Accepted only after Codex reviewer cleanup. Worker stayed in scope but added an oversized 36-test block and non-ASCII comments; Codex trimmed it to 5 focused doc-anchor tests and normalized ASCII.",
+      "filesChanged": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "strengths": [
+        "Stayed inside the allowed test file and did not edit docs or production code.",
+        "Understood the intended durable-doc anchors and found the right documentation set.",
+        "Ran broad verification and reported full-suite status.",
+        "The produced material was useful enough for Codex to trim rather than reject."
+      ],
+      "projectSpecificStrengths": [
+        "Recognized the core future-direction docs for agent execution ontology, self-building apps, DSL operations, and overlays.",
+        "Connected the anti-regression rules with the stage10 guard test file.",
+        "Kept future architecture as guards rather than implementing runtime features."
+      ],
+      "generalizedStackStrengths": [
+        "Can write Vitest tests that read markdown docs from a repo.",
+        "Can work inside a TypeScript architecture guard test file.",
+        "Needs tighter prompt caps for doc-anchor guard granularity."
+      ],
+      "generalizedCodingStrengths": [
+        "Useful bounded worker when scope is explicit.",
+        "Can identify relevant anchors but tends to over-guard documentation wording.",
+        "Needs reviewer cleanup for concise guard design."
+      ],
+      "misses": [
+        "Added 36 doc-anchor tests where the prompt asked for small, robust guard tests.",
+        "Guarded many exact phrases, which would make normal documentation edits noisy.",
+        "Introduced non-ASCII dash punctuation in test comments despite ASCII-only project editing rules.",
+        "Final report test counts were inconsistent during the run as it iterated from 424 to 430 claimed tests."
+      ],
+      "reviewerFixes": [
+        "Codex removed the oversized doc-anchor block and replaced it with 5 focused tests matching the ticket requirements.",
+        "Codex normalized non-ASCII comments to ASCII.",
+        "Codex adjusted a brittle missing XML-tag assertion to guard existing durable phrases instead.",
+        "Codex reran TypeScript, stage10 tests, focused batch tests, rg searches, ASCII checks, and the full suite."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: clean after reviewer cleanup",
+        "npm test -- --run src/__tests__/stage10-architecture-guards.test.ts: 38/38 passed after reviewer cleanup",
+        "Focused final batch tests: 63/63 passed across 3 files",
+        "Full final suite: 402/402 passed across 52 files",
+        "Changed files ASCII check: clean after reviewer cleanup",
+        "rg future doc anchors: expected doc/test hits present"
+      ],
+      "recommendedUse": [
+        "Medium bounded feature-local implementation slices where prior HR already showed strength.",
+        "Doc-anchor guard drafts only if the prompt caps tests and anchors tightly.",
+        "Tasks where Codex can review and trim overbroad guard design."
+      ],
+      "avoidFor": [
+        "Uncapped doc-anchor guard tasks.",
+        "Tasks where exact test counts/reporting must be trusted without verification.",
+        "Persistence, backup/import/export, restore, or migration work."
+      ],
+      "promptImprovements": [
+        "For doc-anchor guard tasks, specify the exact maximum number of tests and anchors.",
+        "Say to guard durable section identity and one or two core phrases only, not every sentence.",
+        "Require ASCII scan before final report.",
+        "Require final report counts to match actual Vitest output after the last edit."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "ASCII scan",
+        "git diff review"
+      ],
+      "tags": [
+        "doc-anchor-guards",
+        "architecture-guards",
+        "medium",
+        "over-guarded-docs"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "kortex-future-docs",
+        "stage10-guards"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "markdown"
+      ],
+      "generalCodingTags": [
+        "regression-guarding",
+        "source-guards",
+        "test-discipline",
+        "scope-control",
+        "bounded-refactor",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-over-guarding-docs",
+        "watch-reporting-counts",
+        "watch-non-ascii-comments",
+        "avoid-persistence-without-review"
+      ]
+    },
+    {
+      "id": "2026-05-05-batch2-deepseek-v4-pro-active-profile-seam-guards",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "DeepSeek V4 Pro",
+      "runner": "Pi CLI (opencode-go/deepseek-v4-pro, --thinking high, --mode json, PI_PERMISSION_LEVEL=high)",
+      "reviewerModel": "Claude Opus 4.7",
+      "promptStyle": "test-only guard",
+      "taskType": "active-profile-seam-runtime-guards",
+      "contextProvided": [
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/ontology/__tests__/activeProfile.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "C:/pi-stuff/FUTURE_PI_PROMPTING.md"
+      ],
+      "allowedWriteScopeStyle": "explicit single-file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether the model can add focused gap-closing tests to an existing seam-guard file under a strict bounded ticket without scope creep, and whether it self-corrects diagnostic flaws (asserting a value that equals the base default).",
+      "promptAdaptationNotes": [
+        "For DeepSeek V4 Pro under Pi, requiring exact test-count caps and an explicit list of required tests with ordered titles works well; the model executes faithfully.",
+        "When the prompt uses active-profile labels for assertion fixtures, pre-check or warn the worker that learning-overlay default labels may overlap with codingProfile defaults so it does not need to self-correct mid-run."
+      ],
+      "task": "Close coverage gaps in the active-profile overlay seam: frozen overlay input safety, three-kind mixed overlay precedence at the seam, no-arg vs empty-array reference equality, same-kind seam-level later-wins precedence.",
+      "slice": "Add exactly 4 new it() blocks inside the existing describe(getActiveDomainProfile overlay seam, ...) block in src/features/ontology/__tests__/activeProfile.test.ts.",
+      "difficulty": "small-medium",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after Codex follow-up review with one test-title cleanup. Worker added the requested 4 tests and self-corrected a diagnostic fixture flaw mid-run; Codex changed an inaccurate same-kind overlay test title so it matched the code. TypeScript clean. Targeted file: 12/12. Full suite contribution: +4.",
+      "filesChanged": [
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "strengths": [
+        "Added exactly the 4 required tests in the requested order with the requested titles.",
+        "Self-corrected a diagnostic flaw without reviewer prompting (renamed learning overlay hubTitle so the fallthrough assertion is meaningfully different from base).",
+        "Object.freeze applied at every nested level the prompt named (overlay, overrideLabels, overrideGraph, overrideGraph.nodeColors, addOntologyNodes array, inner ontology node).",
+        "Used type annotations (Record<string, string>, readonly OntologyNode[]) instead of `as any`.",
+        "Snapshot-and-compare pattern via JSON.parse(JSON.stringify(...)) to prove codingProfile remained unmutated post-frozen-input call.",
+        "Reused makeTestNode helper instead of redefining fixtures."
+      ],
+      "projectSpecificStrengths": [
+        "Correctly distinguished the no-arg/empty-array fast paths (which return codingProfile by reference) from the explicit-overlay path (which composes a fresh runtime profile).",
+        "Verified personal-kind precedence at the seam matches the documented rule from 06_PROFILE_BRANCHING_AND_MERGE.md decision #10."
+      ],
+      "generalizedStackStrengths": [
+        "TypeScript-safe Object.freeze with readonly array annotation rather than as-const or unsafe casts.",
+        "Vitest fixture composition via spread + helper without re-declaring shared fixtures.",
+        "Reversed-input-order assertion pattern to prove kind precedence is order-independent."
+      ],
+      "generalizedCodingStrengths": [
+        "scope-control",
+        "test-discipline",
+        "composition-helper",
+        "precedence-rules",
+        "self-correction-mid-run"
+      ],
+      "misses": [
+        "Final report claimed bash verification was blocked even though edits and grep/tool calls had run successfully under PI_PERMISSION_LEVEL=high.",
+        "Final report implied the four tests were already present from a prior session; they were not present in the worktree before the high-permission run.",
+        "One test title said the same overlay reference was passed twice, but the code actually tested two same-kind project overlays in different orders."
+      ],
+      "reviewerFixes": [
+        "Codex changed the inaccurate test title to: same-kind project overlays apply input order deterministically at the seam.",
+        "Codex reran TypeScript, focused tests, rg checks, and full suite."
+      ],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "12/12 passed (was 8/8, +4 new)",
+        "fullSuite": "410/410 passed across 52 files (was 402; cumulative across all 3 batch slices)",
+        "additionalChecks": "rg `as any` -> 0 matches in changed file; rg @ts-(ignore|expect-error) -> 0; ASCII scan clean"
+      },
+      "recommendedUse": [
+        "Test-only seam-guard slices with exact ordered test lists.",
+        "Single-file scope-bounded tests with explicit fixtures.",
+        "Composition/precedence guard tests with reversed-input-order assertions.",
+        "Tasks where the worker should self-correct diagnostic flaws."
+      ],
+      "avoidFor": [
+        "Persistence, migration, backup/import/restore work.",
+        "Multi-file refactors without explicit per-file scope.",
+        "Tasks where final-report self-confidence matters more than diff correctness."
+      ],
+      "promptImprovements": [
+        "When fixtures use real domain values, pre-check overlap with the base profile defaults; if the test relies on a fallthrough assertion, the prompt should specify a distinct value.",
+        "Require the worker to print exit codes of verification commands directly in the final report; do not let the worker self-report blocked without a concrete error message."
+      ],
+      "usefulTools": [
+        "edit",
+        "read",
+        "grep",
+        "bash"
+      ],
+      "tags": [
+        "active-profile-seam",
+        "composition-precedence",
+        "test-only-guard",
+        "kortex-core"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "active-profile-seam",
+        "kortex-core"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "react-native"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "composition-helper",
+        "precedence-rules",
+        "deep-clone-immutability"
+      ],
+      "riskTags": [
+        "final-report-self-confidence-overstated"
+      ]
+    },
+    {
+      "id": "2026-05-05-batch2-glm-5-1-doc06-branching-anchors",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "GLM 5.1",
+      "runner": "Pi CLI (opencode-go/glm-5.1, --thinking high, --mode json, PI_PERMISSION_LEVEL=high)",
+      "reviewerModel": "Claude Opus 4.7",
+      "promptStyle": "architecture/doc guard",
+      "taskType": "doc-anchor-guard-capped",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md",
+        "src/__tests__/stage10-architecture-guards.test.ts (existing 5-test doc-anchor describe block)",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "C:/pi-stuff/FUTURE_PI_PROMPTING.md",
+        "C:/pi-stuff/HR_REPORT_2026-05-05_ONTOLOGY_GUARD_BATCH.md (Mimo over-guard failure context)"
+      ],
+      "allowedWriteScopeStyle": "explicit single-file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether the model can add a single capped doc-anchor test (1 it block, 5 toContain assertions) to an existing describe block without expanding scope, given an explicit anti-Mimo cap and pre-supplied anchor strings.",
+      "promptAdaptationNotes": [
+        "GLM 5.1 reliably executes pre-specified anchor strings verbatim. Continue feeding it the exact .toContain literals when the prompt has a fixed anchor list."
+      ],
+      "task": "Add capped doc-anchor stage10 guards for ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md, the only durable refactor doc not yet anchor-guarded after the previous batch.",
+      "slice": "Add exactly 1 new it block at the end of describe(Kortex durable doc future-direction anchor guards, ...) in src/__tests__/stage10-architecture-guards.test.ts, containing exactly 5 expect(...).toContain(...) assertions for pre-supplied anchor strings.",
+      "difficulty": "small",
+      "allowedWriteScope": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after Codex follow-up review with one anchor cleanup. Worker added the requested doc06 guard, but Codex replaced a brittle implementation-sequence anchor with durable persistence-boundary anchors. Stage10 remains green.",
+      "filesChanged": [
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "strengths": [
+        "Added exactly 1 it block with exactly 5 assertions, matching spec precisely.",
+        "Used the existing readDoc helper rather than introducing a new helper or re-importing fs.",
+        "Anchor strings used verbatim, including the exact substring of decision #10 from doc 06.",
+        "Did not modify the existing 5 anchor tests in the same describe block.",
+        "Final report was concise and accurate, including before/after test counts."
+      ],
+      "projectSpecificStrengths": [
+        "Respected the Mimo over-guard lesson from the previous batch by capping anchors at 5 and only choosing durable section IDs and decision phrases."
+      ],
+      "generalizedStackStrengths": [
+        "Vitest describe-block extension without restructuring existing tests."
+      ],
+      "generalizedCodingStrengths": [
+        "scope-control",
+        "reporting",
+        "test-discipline",
+        "durable-doc-anchor-design"
+      ],
+      "misses": [
+        "Initial guard used the exact implementation-sequence line \"Add pure composition helpers...\", which is less durable now that composition helpers are already implemented and the doc may later mark that sequence done."
+      ],
+      "reviewerFixes": [
+        "Codex replaced the brittle composition-helper to-do anchor with durable branch-persistence anchors: \"Do not rush into persistence for branches.\" and \"Only then consider storage for branches/patch suggestions.\"",
+        "Codex reran stage10 and focused tests."
+      ],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "39/39 stage10 passed (was 38, +1 new)",
+        "fullSuite": "407/407 passed across 52 files (was 406)"
+      },
+      "recommendedUse": [
+        "Architecture guard and anti-regression documentation slices.",
+        "Capped doc-anchor guard tasks (5 anchors max) when anchors are pre-supplied.",
+        "Single-file additions to existing describe blocks where existing tests must not be touched."
+      ],
+      "avoidFor": [
+        "Implementation work that requires inventing anchor strings without a pre-supplied list (this evaluation does not test that capability)."
+      ],
+      "promptImprovements": [
+        "For doc-anchor guard prompts, continue pre-supplying the exact .toContain literals; this keeps the cap tight and the anchor selection durable."
+      ],
+      "usefulTools": [
+        "edit",
+        "read",
+        "grep",
+        "bash"
+      ],
+      "tags": [
+        "doc-anchor-guard",
+        "stage10",
+        "kortex-core",
+        "profile-branching"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "durable-docs",
+        "kortex-core"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "reporting"
+      ],
+      "riskTags": []
+    },
+    {
+      "id": "2026-05-05-batch2-kimi-k2-6-composition-mixed-kind-tests",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi CLI (opencode-go/kimi-k2.6, --thinking high, --mode json, PI_PERMISSION_LEVEL=high)",
+      "reviewerModel": "Claude Opus 4.7",
+      "promptStyle": "test-only guard",
+      "taskType": "composition-precedence-coverage-extension",
+      "contextProvided": [
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts (existing tests)",
+        "ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md (decision #10)",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "C:/pi-stuff/FUTURE_PI_PROMPTING.md"
+      ],
+      "allowedWriteScopeStyle": "explicit single-file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether the model can add three composition-precedence coverage extensions (3-kind mix, 3-overlay same-kind chain, no-op overlay equivalence) under a strict bounded ticket, including correctly handling a misstated baseline test count in the prompt without overcorrecting.",
+      "promptAdaptationNotes": [
+        "Kimi K2.6 correctly handled an inaccurate baseline-count claim in the prompt (prompt said 21 -> 24; actual was 17 -> 20). It added exactly 3 tests as goal-directed and noted the discrepancy in the final report rather than padding to hit the stated number.",
+        "Prompts can reduce this risk by stating the delta explicitly (add exactly 3 new it blocks; the existing total is approximately N but is not authoritative) rather than absolute before/after counts."
+      ],
+      "task": "Extend profileComposition tests with three focused mixed-kind precedence tests: 3-kind end-to-end precedence regardless of input order, 3-overlay same-kind later-wins chain, no-op overlay equivalence with empty overlay list.",
+      "slice": "Add exactly 3 new it blocks (each in its own describe block) to src/features/ontology/__tests__/profileComposition.test.ts.",
+      "difficulty": "small-medium",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted as-is. Worker added exactly 3 new it blocks (+76 lines), each in its own describe block. Real coverage gaps closed (3-kind mix in one call; 3-overlay same-kind chain with multiple input orderings; no-op overlay equivalence). No `as any`. ASCII clean. Final report correctly noted the prompt baseline count was off (17 actual vs 21 claimed). TypeScript clean. Targeted file: 20/20 (was 17). Full suite: 410/410 (was 407, +3).",
+      "filesChanged": [
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "strengths": [
+        "Added exactly 3 new it blocks, each in its own descriptive describe.",
+        "Reused makeOverlay and makeTestNode helpers without redefining.",
+        "Three reversed input orderings used to prove same-kind later-wins is order-independent ([a,b,c]->C, [c,b,a]->A, [b,c,a]->A).",
+        "Noted the baseline-count discrepancy in the final report rather than padding tests to hit the stated number.",
+        "No-op overlay test verifies labels, ontology arrays, metadata field count, ontology node count, and graph nodeColor equality with both base and empty-overlay-list paths."
+      ],
+      "projectSpecificStrengths": [
+        "Per-field precedence assertions in the 3-kind mix test (hubTitle from personal, itemSingular from learning when personal does not override, mechanism color from personal, proj_only itemTypeNodeId still present from project).",
+        "Used personalNoHub variant to prove learning surfaces when personal does not override."
+      ],
+      "generalizedStackStrengths": [
+        "Vitest describe-per-test pattern for grouping multi-step assertions cleanly."
+      ],
+      "generalizedCodingStrengths": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "composition-helper",
+        "precedence-rules",
+        "reporting"
+      ],
+      "misses": [],
+      "reviewerFixes": [
+        "No code changes were required after Kimi.",
+        "Codex reran TypeScript, focused tests, rg checks, and full suite."
+      ],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "20/20 passed in profileComposition.test.ts (was 17, +3 new)",
+        "fullSuite": "410/410 passed across 52 files",
+        "additionalChecks": "rg `as any` -> 0; rg @ts-(ignore|expect-error) -> 0; rg -c \"^\\s*it\\(\" -> 20"
+      },
+      "recommendedUse": [
+        "Composition/precedence helper extension tests with explicit reversed-order assertions.",
+        "Profile-label and seam-test slices with strict bounded tickets.",
+        "Tasks where the prompt may contain minor inaccuracies the model should treat as non-authoritative."
+      ],
+      "avoidFor": [
+        "Persistence and migration tasks (no Pi worker is currently trusted there)."
+      ],
+      "promptImprovements": [
+        "When the prompt asserts a before/after test count, frame it as approximate (add exactly N new tests; baseline is approximately M) so the worker is not pulled toward an inaccurate absolute number.",
+        "Continue requiring reversed-input-order tests for any composition-precedence coverage extension."
+      ],
+      "usefulTools": [
+        "edit",
+        "read",
+        "grep",
+        "bash"
+      ],
+      "tags": [
+        "composition-precedence",
+        "profile-overlay",
+        "test-only-guard",
+        "kortex-core"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "profile-overlay",
+        "kortex-core"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "react-native"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "composition-helper",
+        "precedence-rules",
+        "reporting"
+      ],
+      "riskTags": []
+    },
+    {
+      "id": "2026-05-06-batch3-kimi-k2-6-corrections-composed-profile",
+      "date": "2026-05-06",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi CLI 0.72.0 (opencode-go/kimi-k2.6, PI_PERMISSION_LEVEL=high, --thinking high)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "ontology-correction-composed-profile-tests",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md",
+        "src/features/ontology/corrections.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/__tests__/corrections.test.ts",
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi can add correction-validation coverage around composed overlay profiles without changing production code or product semantics.",
+      "promptAdaptationNotes": [
+        "Initial one-shot run was blocked by the local quiet-hours/go-to-bed extension; the same session completed after explicit continuation confirmation. Do not score the initial refusal as model failure.",
+        "For correction validation tests, require both composed-profile acceptance and base-profile rejection so the assertion proves profile-parameter behavior."
+      ],
+      "task": "Add correction validation tests for overlay-added type ids against explicitly composed profiles.",
+      "slice": "Batch 3 Slice 1 - Correction validation with composed profiles",
+      "difficulty": "small",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/corrections.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted as-is after same-session continuation confirmation. Worker added exactly 3 tests to corrections.test.ts and changed no production source. Tests prove overlay-only corrected and previous type ids validate against an explicitly composed active profile and fail against base codingProfile, plus composed-profile/overlay immutability.",
+      "filesChanged": [
+        "src/features/ontology/__tests__/corrections.test.ts"
+      ],
+      "strengths": [
+        "Stayed inside the single-file test scope.",
+        "Used getActiveDomainProfile([overlay]) to prove the public composed-profile seam works with correction validation.",
+        "Added diagnostic base-profile rejection checks for overlay-only corrected and previous type ids.",
+        "Ran TypeScript, focused tests, and full suite successfully."
+      ],
+      "projectSpecificStrengths": [
+        "Reinforces the Kortex branch/overlay model without adding correction persistence or profile mutation.",
+        "Shows correction evidence validation depends on the supplied active profile, not a hidden global profile."
+      ],
+      "generalizedStackStrengths": [
+        "TypeScript/Vitest test-only change with clean focused and full suite verification."
+      ],
+      "generalizedCodingStrengths": [
+        "Good scope control, test discipline, and compatibility-boundary reasoning."
+      ],
+      "misses": [
+        "First non-interactive Pi attempt was blocked by the local quiet-hours extension before any model work; resumed session completed correctly."
+      ],
+      "reviewerFixes": [],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "28/28 passed across corrections.test.ts and activeProfile.test.ts at slice time",
+        "fullSuite": "413/413 passed across 52 files at slice time",
+        "additionalChecks": "No production source changed."
+      },
+      "recommendedUse": [
+        "Strict bounded ontology test-hardening slices.",
+        "Correction validation tests where product semantics are already settled."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, migrations, or data-loss-adjacent work.",
+        "Any task requiring a product or architecture decision."
+      ],
+      "promptImprovements": [
+        "If a local quiet-hours extension blocks non-interactive Pi, resume the same session with explicit continuation confirmation or use --no-extensions after human confirmation."
+      ],
+      "usefulTools": [
+        "read",
+        "grep",
+        "edit",
+        "bash"
+      ],
+      "tags": [
+        "corrections",
+        "composed-profile",
+        "test-only-guard",
+        "profile-overlay"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "profile-overlay",
+        "correction-evidence"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "react-native"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "compatibility-boundary"
+      ],
+      "riskTags": []
+    },
+    {
+      "id": "2026-05-06-batch3-kimi-k2-6-override-ontology-coverage",
+      "date": "2026-05-06",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Kimi K2.6",
+      "runner": "Pi CLI 0.72.0 --no-extensions (opencode-go/kimi-k2.6, PI_PERMISSION_LEVEL=high, --thinking high)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-composition-overrideOntology-tests",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Kimi can close implementation-path coverage gaps for overrideOntology without changing production composition behavior.",
+      "promptAdaptationNotes": [
+        "For composition edge tests, continue requiring no production edits, dedupe checks, and deep-clone reference assertions."
+      ],
+      "task": "Add overrideOntology composition tests for id merging/deduping, node deep cloning, and composition with typed add fields.",
+      "slice": "Batch 3 Slice 2 - overrideOntology composition coverage",
+      "difficulty": "small",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "rating": "strong",
+      "score": 9,
+      "outcome": "Accepted after tiny reviewer wording cleanup. Worker added exactly 3 overrideOntology tests, changed no production source, and verified with tsc, targeted profileComposition tests, and full suite.",
+      "filesChanged": [
+        "src/features/ontology/__tests__/profileComposition.test.ts"
+      ],
+      "strengths": [
+        "Covered overrideOntology item/relationship id merge and dedupe behavior.",
+        "Covered deep clone behavior for overrideOntology.nodes including boundary-rule evidenceIds.",
+        "Covered composition between typed add fields and overrideOntology without duplicate ids.",
+        "Stayed inside the test-only write scope."
+      ],
+      "projectSpecificStrengths": [
+        "Strengthens the current branch/overlay composition helper without turning it into persistence or runtime activation."
+      ],
+      "generalizedStackStrengths": [
+        "Solid TypeScript/Vitest test extension around pure merge-helper behavior."
+      ],
+      "generalizedCodingStrengths": [
+        "Good composition-helper coverage, deep-clone awareness, and scope control."
+      ],
+      "misses": [
+        "Used one non-neutral fixture phrase that referenced the late-night context."
+      ],
+      "reviewerFixes": [
+        "Codex changed the fixture phrase to a neutral profile-branch phrase."
+      ],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "23/23 profileComposition tests passed at slice time",
+        "fullSuite": "416/416 passed across 52 files at slice time",
+        "additionalChecks": "No as any / ts-ignore / ts-expect-error patterns introduced."
+      },
+      "recommendedUse": [
+        "Strict bounded profile composition test coverage.",
+        "Pure merge-helper edge tests with dedupe and clone assertions."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, migrations, or data-loss-adjacent work.",
+        "Any task requiring a product or architecture decision."
+      ],
+      "promptImprovements": [
+        "Keep fixture wording neutral; avoid letting local runtime context leak into test data."
+      ],
+      "usefulTools": [
+        "read",
+        "grep",
+        "edit",
+        "bash"
+      ],
+      "tags": [
+        "profile-composition",
+        "overrideOntology",
+        "test-only-guard",
+        "deep-clone-immutability"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "profile-overlay",
+        "overrideOntology"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "react-native"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "composition-helper",
+        "deep-clone-immutability"
+      ],
+      "riskTags": []
+    },
+    {
+      "id": "2026-05-06-batch3-qwen3-6-plus-active-helper-seam",
+      "date": "2026-05-06",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi CLI 0.72.0 --no-extensions (opencode-go/qwen3.6-plus, PI_PERMISSION_LEVEL=high, --thinking high)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "active-profile-helper-seam-tests",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Qwen can add small active-profile helper seam tests that prove explicit profile-parameter behavior and no hidden overlay state.",
+      "promptAdaptationNotes": [
+        "Qwen produced good code but mixed historical and current suite-count arithmetic in the final report. Reviewer should trust command output, not narrative arithmetic."
+      ],
+      "task": "Add getOntologyNode/getOntologyNodeLabel tests for composed profiles and default-profile isolation.",
+      "slice": "Batch 3 Slice 3 - Active-profile ontology helper seam coverage",
+      "difficulty": "small",
+      "allowedWriteScope": [
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "rating": "strong-with-reporting-caveat",
+      "score": 8,
+      "outcome": "Accepted. Worker added exactly 3 active-profile helper tests and changed no production source. Code/test output was scoped and useful; final report briefly confused historical suite counts before reporting the real command output.",
+      "filesChanged": [
+        "src/features/ontology/__tests__/activeProfile.test.ts"
+      ],
+      "strengths": [
+        "Added getOntologyNode import and exactly 3 parameter-driven helper tests.",
+        "Proved overlay-added nodes are only visible when a composed profile is explicitly passed.",
+        "Proved label overrides and two composed profiles do not leak hidden active state.",
+        "Ran TypeScript, targeted activeProfile tests, and full suite successfully."
+      ],
+      "projectSpecificStrengths": [
+        "Directly reinforces the explicit-only active-profile overlay seam and no-hidden-state direction."
+      ],
+      "generalizedStackStrengths": [
+        "Clean TypeScript/Vitest test-only change with no production behavior changes."
+      ],
+      "generalizedCodingStrengths": [
+        "Good scope control and seam-testing behavior; reporting arithmetic requires reviewer verification."
+      ],
+      "misses": [
+        "Final report arithmetic drifted when comparing current 419 tests against stale historical 402 counts."
+      ],
+      "reviewerFixes": [],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "15/15 activeProfile tests passed at slice time",
+        "fullSuite": "419/419 passed across 52 files at slice time",
+        "additionalChecks": "No as any / ts-ignore / ts-expect-error patterns introduced."
+      },
+      "recommendedUse": [
+        "Small active-profile helper seam tests.",
+        "Small TypeScript API/composition tests where command output is easy for Codex to verify."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, migrations, or data-loss-adjacent work.",
+        "Any task requiring a product or architecture decision.",
+        "Tasks where inaccurate final-report arithmetic would be hard to catch."
+      ],
+      "promptImprovements": [
+        "Require workers to report raw command output counts separately from narrative before/after arithmetic."
+      ],
+      "usefulTools": [
+        "read",
+        "grep",
+        "edit",
+        "bash"
+      ],
+      "tags": [
+        "active-profile",
+        "helper-seam",
+        "test-only-guard",
+        "qwen"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "active-profile-overlay",
+        "profile-parameter-driven"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "react-native"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "reporting"
+      ],
+      "riskTags": [
+        "final-report-count-arithmetic"
+      ]
+    },
+    {
+      "id": "2026-05-06-batch3-glm-5-1-doc-sync",
+      "date": "2026-05-06",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "GLM 5.1",
+      "runner": "Pi CLI 0.72.0 --no-extensions (opencode-go/glm-5.1, PI_PERMISSION_LEVEL=high, --thinking high)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "architecture/doc guard",
+      "taskType": "refactor-doc-sync",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/TOMORROW_START.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "src/features/ontology/__tests__/activeProfile.test.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts",
+        "src/features/ontology/__tests__/corrections.test.ts",
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether GLM can sync architecture handoff docs after bounded test-hardening batches without inventing product behavior.",
+      "promptAdaptationNotes": [
+        "For doc-sync tasks, require a git diff --name-only cross-check before editing current changed-files sections."
+      ],
+      "task": "Update NEXT_LLM_CONTEXT, TOMORROW_START, and implementation_handoff to reflect Batch 2 and Batch 3 hardening and latest verification.",
+      "slice": "Batch 3 Slice 4 - Refactor doc sync after Batch 2 and Batch 3",
+      "difficulty": "small",
+      "allowedWriteScope": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/TOMORROW_START.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong-with-doc-cleanup",
+      "score": 8,
+      "outcome": "Accepted after reviewer doc cleanup. Worker updated the right docs, preserved future architecture boundaries, and ran verification. Codex removed one stale current-changed-file entry and corrected the local tool-folder note.",
+      "filesChanged": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/TOMORROW_START.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "strengths": [
+        "Captured Batch 2 and Batch 3 test hardening without claiming product behavior changed.",
+        "Updated latest verification to 93/93 focused and 419/419 full suite.",
+        "Preserved the next major decision gate rather than inventing persistence/UI direction.",
+        "Ran tsc, focused tests, full suite, and stage10 guard tests."
+      ],
+      "projectSpecificStrengths": [
+        "Kept Kortex Core, profile overlay, agent/app/DSL/adapter directions as future architecture only."
+      ],
+      "generalizedStackStrengths": [
+        "Good documentation-only sync backed by Vitest/TypeScript verification."
+      ],
+      "generalizedCodingStrengths": [
+        "Good doc maintenance and decision-boundary preservation; needs current-file-list cross-check."
+      ],
+      "misses": [
+        "Left ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md in Current Changed Files even though it was not modified in the current worktree."
+      ],
+      "reviewerFixes": [
+        "Removed stale 05_ANTI_REGRESSION_RULES.md current-changed-file entry.",
+        "Updated local tool-folder note to say Pi prompts/logs live under C:/pi-stuff, not repo .pi/."
+      ],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "93/93 passed across profileComposition, activeProfile, corrections, and stage10 guards",
+        "fullSuite": "419/419 passed across 52 files",
+        "additionalChecks": "stage10 architecture guards 39/39 passed"
+      },
+      "recommendedUse": [
+        "Architecture guard docs.",
+        "Anti-regression docs.",
+        "Handoff/doc-sync after implementation batches, with changed-file-list cross-check."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, migrations, or data-loss-adjacent work.",
+        "Any task requiring a product or architecture decision.",
+        "Current changed-file summaries unless git diff --name-only is included as a required check."
+      ],
+      "promptImprovements": [
+        "For doc-sync tasks, require exact git diff --name-only output before editing changed-file lists."
+      ],
+      "usefulTools": [
+        "read",
+        "grep",
+        "edit",
+        "bash"
+      ],
+      "tags": [
+        "doc-sync",
+        "handoff",
+        "architecture-docs",
+        "glm"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "next-llm-context",
+        "implementation-handoff"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "test-discipline",
+        "scope-control",
+        "documentation-sync",
+        "reporting"
+      ],
+      "riskTags": [
+        "stale-changed-file-list"
+      ]
+    },
+    {
+      "id": "2026-05-06-batch4-qwen-3-6-plus-active-profile-source",
+      "date": "2026-05-06",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi CLI 0.72.0 (opencode-go/qwen3.6-plus, PI_PERMISSION_LEVEL=high, --thinking high)",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "typescript-api-shape-profile-composition",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md",
+        "ONTOLOGY_PROFILE_REFACTOR/05_ANTI_REGRESSION_RULES.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/__tests__/activeProfile.test.ts",
+        "src/__tests__/stage10-architecture-guards.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Qwen can add a small internal TypeScript API helper around the active-profile overlay seam while preserving no-global-state and no-persistence boundaries.",
+      "promptAdaptationNotes": [
+        "For new-file slices, explicitly require the edit tool instead of shell redirection/cat-style file creation.",
+        "Still review imports for unused values even when TypeScript passes; noUnusedLocals may not catch every cleanup concern in this repo."
+      ],
+      "task": "Add ActiveDomainProfileSource and resolveActiveDomainProfile so callers can supply a structured base profile plus overlays without persistence, UI, global state, or automatic activation.",
+      "slice": "Batch 4 Slice 1 - Explicit active-profile source resolver",
+      "difficulty": "small",
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileActivation.ts",
+        "src/features/ontology/__tests__/profileActivation.test.ts",
+        "src/features/ontology/__tests__/activeProfile.test.ts if needed"
+      ],
+      "rating": "accepted-with-minor-reviewer-cleanup",
+      "score": 8,
+      "outcome": "Accepted after minor reviewer cleanup. Worker added the correct pure resolver, source type, index exports, and 10 focused tests. Codex removed unused imports left in index.ts and profileActivation.ts, then reran TypeScript, targeted tests, required rg checks, focused five-suite verification, and the full suite.",
+      "filesChanged": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileActivation.ts",
+        "src/features/ontology/__tests__/profileActivation.test.ts"
+      ],
+      "strengths": [
+        "Implemented the requested pure resolver without adding DB, UI, persistence, global state, setter functions, or automatic activation.",
+        "Preserved getActiveDomainProfile no-arg and empty-array reference behavior.",
+        "Added strong focused tests for omitted, null, and empty overlays; explicit composition; immutability; no-cache behavior; and non-default base profiles.",
+        "Ran TypeScript, targeted tests, full suite, and required rg checks."
+      ],
+      "projectSpecificStrengths": [
+        "Kept the Kortex branch/overlay work at an explicit source seam rather than crossing into unresolved persistence/UI decisions.",
+        "Worked within the active-profile overlay architecture and stage10 no-hidden-state guards."
+      ],
+      "generalizedStackStrengths": [
+        "Good small TypeScript API helper and Vitest coverage in an existing feature folder.",
+        "Good preservation of existing overload behavior while extracting implementation through a pure helper."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong scope discipline and compatibility-preserving refactor behavior under a strict bounded ticket.",
+        "Good test discipline around reference equality, immutability, and no-cache behavior."
+      ],
+      "misses": [
+        "Left unused imports in index.ts and profileActivation.ts that Codex removed before acceptance.",
+        "Used shell redirection/cat to create new files instead of the edit tool, which makes file-creation diffs less auditable.",
+        "Final report contained some mojibake/checkmark encoding noise from the terminal stream."
+      ],
+      "reviewerFixes": [
+        "Removed unused composeDomainProfile and ActiveDomainProfileSource imports from index.ts.",
+        "Removed unused ProfileOverlay import from profileActivation.ts.",
+        "Updated durable handoff docs with Batch 4 source resolver state and latest verification."
+      ],
+      "verification": {
+        "typescript": "clean",
+        "targetedTests": "64/64 passed across profileActivation, activeProfile, and stage10 guards",
+        "focusedTests": "103/103 passed across profileComposition, activeProfile, corrections, profileActivation, and stage10 guards",
+        "fullSuite": "429/429 passed across 53 files",
+        "additionalChecks": "Required rg checks found banned active-profile/persistence names only in stage10 guard tests; no as any, @ts-ignore, or @ts-expect-error in changed ontology source/test files."
+      },
+      "recommendedUse": [
+        "Small/medium TypeScript API helper slices with explicit scope.",
+        "Profile composition and activation seam helpers.",
+        "Reference-equality and immutability test additions."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, migrations, or data-loss-adjacent work.",
+        "Broad autonomous architecture choices or product decisions.",
+        "New-file-heavy slices unless the prompt explicitly requires edit-tool creation and Codex reviews diffs closely."
+      ],
+      "promptImprovements": [
+        "When new files are in scope, explicitly say to use the edit tool rather than shell redirection/cat file creation.",
+        "Require final self-check for unused imports in touched TypeScript files.",
+        "Keep requiring exact rg checks for hidden state and persistence table names on active-profile work."
+      ],
+      "usefulTools": [
+        "read",
+        "grep",
+        "find",
+        "ls",
+        "edit",
+        "bash"
+      ],
+      "tags": [
+        "qwen",
+        "active-profile",
+        "profile-activation",
+        "typescript-api",
+        "bounded-refactor"
+      ],
+      "projectTags": [
+        "ontology-profile-refactor",
+        "active-profile-source",
+        "profile-overlays"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "test-discipline",
+        "scope-control",
+        "interface-propagation"
+      ],
+      "riskTags": [
+        "unused-import-cleanup",
+        "shell-file-creation"
+      ]
     }
   ],
   "generalizedLessons": [
@@ -2532,6 +4068,71 @@
         "Qwen 3.6 Plus",
         "future composition-helper workers"
       ]
+    },
+    {
+      "id": "pi-cli-json-mode-windows",
+      "lesson": "For Codex-run Pi HR on Windows, use high thinking, JSON mode, a quoted comma-separated tools allowlist, and pass prompt text from Get-Content -Raw into -p. Do not score low-thinking syntax probes or ambiguous @file attachment runs.",
+      "appliesTo": [
+        "all Pi CLI worker evaluations"
+      ]
+    },
+    {
+      "id": "doc-anchor-guard-restraint",
+      "lesson": "For durable-doc guard tests, guard section identity and a few core anchors rather than every sentence. Over-anchoring documentation creates noisy tests and reviewer cleanup.",
+      "appliesTo": [
+        "Mimo v2.5 Pro",
+        "future architecture/doc guard workers"
+      ]
+    },
+    {
+      "id": "pause-after-score-seven-or-below",
+      "lesson": "Any real worker result scored 7/10 or below must pause the batch before another edit-capable slice starts. Codex should review what went wrong, classify whether it was model behavior, prompt design, task choice, or reviewer cleanup, update HR/prompt rules, and only then continue.",
+      "appliesTo": [
+        "all Pi CLI worker evaluations",
+        "multi-slice HR batches"
+      ]
+    },
+    "For Codex/Claude-orchestrated Pi runs on Windows, set PI_PERMISSION_LEVEL=high in the launching shell. Lower levels (minimal/low) silently block edit/bash tool calls so the worker plans the change but never writes; the slice will appear to complete with exit code 0 yet produce no diff.",
+    "When a prompt asserts an absolute before/after test count, prefer \"add exactly N new tests; baseline is approximately M\" framing so the worker is not pulled toward an inaccurate absolute number.",
+    "On Windows PowerShell 5.1, do NOT pipe Pi --mode json output through Tee-Object. PS 5.1 wraps native-exe stdout in a way that can deadlock; instead invoke Pi from Git Bash and redirect with `> file 2>&1`, or rely on Pi --session-dir for the audit trail.",
+    {
+      "id": "2026-05-06-pi-quiet-hours-noninteractive-worker-handling",
+      "date": "2026-05-06",
+      "lesson": "Keep full npm:mitsupi installed for Pi, but disable only Mitsupi's extensions/go-to-bed.ts from the package manifest. If a package update restores the quiet-hours blocker and it blocks a non-interactive HR worker after the human explicitly asked to continue, disable only that extension again or use --no-extensions as a temporary fallback while keeping PI_PERMISSION_LEVEL=high, --thinking high, --mode json, and the normal tool allowlist. Do not score the initial refusal as a model-quality failure.",
+      "appliesTo": [
+        "pi-cli",
+        "hr-workflow",
+        "non-interactive-runs"
+      ],
+      "sourceEvaluationIds": [
+        "2026-05-06-batch3-kimi-k2-6-corrections-composed-profile"
+      ]
+    },
+    {
+      "id": "2026-05-06-new-file-workers-use-edit-tool",
+      "date": "2026-05-06",
+      "lesson": "For Pi worker slices that create new files, explicitly require use of the edit tool rather than shell redirection/cat-style file creation. The latter can still produce correct files, but it is less auditable and less aligned with reviewer expectations.",
+      "appliesTo": [
+        "pi-cli",
+        "prompting",
+        "new-file-slices"
+      ],
+      "sourceEvaluationIds": [
+        "2026-05-06-batch4-qwen-3-6-plus-active-profile-source"
+      ]
+    },
+    {
+      "id": "2026-05-06-review-unused-imports-even-after-clean-tsc",
+      "date": "2026-05-06",
+      "lesson": "For TypeScript helper/refactor slices, Codex should review touched imports for unused values even when tsc passes. Some repo settings may not fail on cleanup-level unused imports, but they still reduce acceptance quality.",
+      "appliesTo": [
+        "typescript",
+        "review",
+        "bounded-refactor"
+      ],
+      "sourceEvaluationIds": [
+        "2026-05-06-batch4-qwen-3-6-plus-active-profile-source"
+      ]
     }
   ],
   "promptStyleTaxonomy": {
@@ -2549,6 +4150,9 @@
     "For read-only label audits, include placeholders, conditional labels, empty states, subtitles, and error text in the required search target list.",
     "For composition helpers with priority rules, require reversed/input-order tests that prove the priority policy, such as personal overlays winning even when listed before project overlays.",
     "For nested partial override APIs, require TypeScript-safe nested partial examples plus runtime tests for nested fields.",
-    "For pure merge helpers, require nested deep-clone/no-shared-reference checks, not only input snapshot equality."
+    "For pure merge helpers, require nested deep-clone/no-shared-reference checks, not only input snapshot equality.",
+    "For Codex-run Pi HR on Windows, use --thinking high, --mode json, quoted --tools, and prompt text from Get-Content -Raw; do not score low-thinking syntax probes.",
+    "For doc-anchor guard tasks, cap the expected number of tests and anchors, and guard durable section identity rather than every exact wording detail.",
+    "If a real worker result scores 7/10 or below, pause the batch, write a failure review, update HR/prompt rules, and only then continue with more edit-capable slices."
   ]
 }

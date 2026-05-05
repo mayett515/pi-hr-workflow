@@ -37,6 +37,14 @@ Recent promoted prompt improvements:
 - for composition/precedence helpers, require reversed/input-order tests that prove priority policy, not only same-order overlay tests
 - for nested partial override APIs, require type-safe nested examples plus runtime tests for nested fields
 - for pure merge helpers, require deep-clone/no-shared-reference checks, not only input snapshot equality
+- for Codex-run Pi HR on Windows, use `--thinking high`, `--mode json`, quoted `--tools`, and prompt text from `Get-Content -Raw`
+- for new-file worker slices, explicitly require the `edit` tool instead of shell redirection/cat-style file creation
+- for TypeScript helper/refactor slices, review touched imports for unused values even when `tsc` passes
+- for doc-anchor guard tasks, cap the number of tests/anchors so workers do not turn durable-doc checks into brittle wording locks
+- on Windows, set `PI_PERMISSION_LEVEL=high` before launching Pi for HR worker runs; lower levels (`minimal`/`low`) silently block edit/bash so the worker plans the change but never writes (slice will exit 0 with no diff)
+- on Windows PowerShell 5.1, do not pipe Pi `--mode json` output through `Tee-Object`; PS 5.1 wraps native-exe stdout in a way that can deadlock the run. Invoke Pi from Git Bash and redirect with `> file 2>&1`, or rely on Pi `--session-dir` for the audit trail
+- when a prompt asserts a before/after test count, prefer "add exactly N new tests; baseline is approximately M" framing; absolute counts can be off and may pull a faithful worker toward padding
+- keep full `npm:mitsupi` installed, but disable only Mitsupi's `extensions/go-to-bed.ts` from the package manifest; if a package update restores that local quiet-hours blocker, disable only that extension again or use `--no-extensions` as a temporary fallback; do not score the initial refusal as a model-quality failure
 
 ## How To Add a New Evaluation
 
@@ -97,6 +105,20 @@ Use `generalizedCodingStrengths` for broader coding behavior that transfers acro
 
 Use `promptStyle`, `promptStrictness`, and `evaluationMeaning` to interpret how transferable a result is. A strong score from `strict bounded ticket` means the model is useful when managed like a scoped worker. A strong score from a looser prompt means the model may have better autonomous planning ability.
 
+## Pause Rule For Scores 7 Or Below
+
+Any real worker result scored `7/10` or below triggers a pause before the next edit-capable slice.
+
+Codex must write a short failure review in the HR record before continuing:
+
+- what went wrong
+- whether the issue came from model behavior, prompt design, task choice, or reviewer cleanup
+- what code/docs were rejected, reverted, trimmed, repaired, or accepted with caveats
+- what prompt improvement or model-assignment rule follows from the result
+- whether the model should be restricted or avoided for that task type
+
+This applies even if the final accepted diff is clean after Codex cleanup. The HR score describes the worker result, and a low score means the workflow needs a review checkpoint.
+
 ## Tag Categories
 
 Use tag categories so a future LLM can transfer lessons correctly:
@@ -133,13 +155,13 @@ When asked which model to use for a task:
 ## Current Short Read
 
 - Kimi 2.5 is currently trusted for small bounded Pi refactor slices.
-- Mimo 2.5 Pro is currently trusted for medium bounded Pi refactor slices inside one feature.
-- Qwen 3.6 Plus is currently trusted for medium compatibility-preserving TypeScript API/payload rename slices, tiny/small strict profile-label wiring tickets, small TypeScript domain-shape/validation-helper groundwork, and small/medium internal profile/core composition helpers. Require separate tests for optional/null shapes, precedence rules independent of raw input order, nested partial overrides, and deep-clone reference safety.
+- Mimo 2.5 Pro is currently trusted for medium bounded Pi refactor slices inside one feature. For doc-anchor guard tasks, cap the expected number of tests and anchors because it can over-guard and need reviewer trimming.
+- Qwen 3.6 Plus is currently trusted for medium compatibility-preserving TypeScript API/payload rename slices, tiny/small strict profile-label wiring tickets, small TypeScript domain-shape/validation-helper groundwork, small/medium internal profile/core composition helpers, small active-profile helper seam tests, and explicit active-profile source/resolver helpers. Require separate tests for optional/null shapes, precedence rules independent of raw input order, nested partial overrides, deep-clone/reference safety, and reviewer verification of final-report test-count arithmetic. Also review touched imports and require `edit`-tool file creation for new-file slices.
 - MiniMax M 2.7 is usable for small UI rename slices, but needs reviewer attention around deprecated compatibility shims.
-- DeepSeek V4 Pro under Pi is currently trusted for focused test-only regression guard slices with precise failure modes.
+- DeepSeek V4 Pro under Pi is currently trusted for focused test-only regression/source-guard slices with precise failure modes, and for active-profile seam runtime guards. Verify final-report test counts; it can overstate counts and may also self-report verification commands as "blocked" while edits and bash actually ran successfully. On the upside, it can self-correct mid-run diagnostic flaws (e.g. it caught a fallthrough assertion that would have passed against the base default and rewrote the fixture).
 - DeepSeek V4 Flash is usable as a fast read-only scout for label/hardcoding audits, but needs Codex source verification before acting on findings.
-- GLM 5.1 is currently trusted for architecture guard and anti-regression documentation slices.
-- Kimi K2.6 is currently trusted for strict bounded ticket work on compatibility-alias, profile-label wiring, and small/medium TypeScript UI/API cleanup slices; require explicit handoff verification updates when docs are in scope.
+- GLM 5.1 is currently trusted for architecture guard, anti-regression documentation, and handoff/doc-sync slices. Verify current changed-file lists against `git diff --name-only`; it can preserve a stale file entry from an older batch.
+- Kimi K2.6 is currently trusted for strict bounded ticket work on compatibility-alias, profile-label wiring, active-profile seam tests, correction validation against composed profiles, composition-precedence coverage extensions (mixed-kind, 3-overlay same-kind chains, no-op overlay equivalence), `overrideOntology` composition coverage, and small/medium TypeScript UI/API cleanup slices; require explicit handoff verification updates when docs are in scope. Will correctly flag prompt inaccuracies (e.g. misstated baseline counts) in the final report rather than padding to fit.
 - No Pi model has earned trust for persistence, backup, import, restore, or migration tasks yet.
 - Persistence, backup, import, restore, and migration tasks should stay with the strongest reviewer unless the worker is only generating a draft.
 
@@ -156,3 +178,5 @@ A 10/10 worker does not just pass tests. It also makes reviewer acceptance obvio
 - no reviewer interpretation needed
 
 If a worker is strong but needs reviewer judgment around scope or optional behavior, score it closer to 8/10.
+
+If a worker scores 7/10 or below, pause the batch and perform the failure review before assigning more work.

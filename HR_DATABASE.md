@@ -34,6 +34,9 @@ Recent promoted prompt improvements:
 - for dynamic/pluralized UI label changes, require rendered examples for singular and plural cases
 - do not reuse generic singular/plural profile labels for inline text unless their capitalization exactly matches the old rendered wording
 - for read-only label audits, include placeholders, conditional labels, empty states, subtitles, errors, and button text in the search target list
+- for composition/precedence helpers, require reversed/input-order tests that prove priority policy, not only same-order overlay tests
+- for nested partial override APIs, require type-safe nested examples plus runtime tests for nested fields
+- for pure merge helpers, require deep-clone/no-shared-reference checks, not only input snapshot equality
 
 ## How To Add a New Evaluation
 
@@ -131,7 +134,7 @@ When asked which model to use for a task:
 
 - Kimi 2.5 is currently trusted for small bounded Pi refactor slices.
 - Mimo 2.5 Pro is currently trusted for medium bounded Pi refactor slices inside one feature.
-- Qwen 3.6 Plus is currently trusted for medium compatibility-preserving TypeScript API/payload rename slices, tiny/small strict profile-label wiring tickets, and small TypeScript domain-shape/validation-helper groundwork. Require separate tests for optional and nullable shape semantics.
+- Qwen 3.6 Plus is currently trusted for medium compatibility-preserving TypeScript API/payload rename slices, tiny/small strict profile-label wiring tickets, small TypeScript domain-shape/validation-helper groundwork, and small/medium internal profile/core composition helpers. Require separate tests for optional/null shapes, precedence rules independent of raw input order, nested partial overrides, and deep-clone reference safety.
 - MiniMax M 2.7 is usable for small UI rename slices, but needs reviewer attention around deprecated compatibility shims.
 - DeepSeek V4 Pro under Pi is currently trusted for focused test-only regression guard slices with precise failure modes.
 - DeepSeek V4 Flash is usable as a fast read-only scout for label/hardcoding audits, but needs Codex source verification before acting on findings.

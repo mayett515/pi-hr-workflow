@@ -229,7 +229,10 @@
     "alias-migration": "Can add a preferred new field or API while preserving and documenting a legacy alias.",
     "regression-guarding": "Can add targeted tests or source guards for known failure modes.",
     "source-guards": "Can write source-level architecture guards where runtime tests would be too heavy.",
-    "prompt-style-aware": "Result includes enough prompt-shape metadata to compare fairly with other model runs."
+    "prompt-style-aware": "Result includes enough prompt-shape metadata to compare fairly with other model runs.",
+    "composition-helper": "Can build pure merge/composition helpers with deterministic precedence and focused tests.",
+    "precedence-rules": "Can encode ordering or priority rules; prompts should prove behavior with reversed/input-order tests.",
+    "deep-clone-immutability": "Can preserve input immutability and avoid shared nested mutable structures when merging config objects."
   },
   "evaluations": [
     {
@@ -2430,6 +2433,165 @@
         "watch-overclaiming-guard-coverage",
         "avoid-persistence-without-review"
       ]
+    },
+    {
+      "id": "2026-05-05-qwen-3-6-plus-profile-composition",
+      "date": "2026-05-05",
+      "projectId": "codelens-rn-ontology-profile",
+      "model": "Qwen 3.6 Plus",
+      "runner": "Pi / OpenCode worker",
+      "reviewerModel": "Codex GPT-5",
+      "promptStyle": "strict bounded ticket",
+      "taskType": "profile-composition-helper",
+      "contextProvided": [
+        "ONTOLOGY_PROFILE_REFACTOR/NEXT_LLM_CONTEXT.md",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md",
+        "ONTOLOGY_PROFILE_REFACTOR/06_PROFILE_BRANCHING_AND_MERGE.md",
+        "ONTOLOGY_PROFILE_REFACTOR/07_KORTEX_CORE_AND_CHILD_CORES.md",
+        "ONTOLOGY_PROFILE_REFACTOR/08_KORTEX_LANGUAGE_LAYER_AND_ADAPTERS.md",
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profiles/codingProfile.ts",
+        "src/features/ontology/__tests__/codingProfile.test.ts"
+      ],
+      "allowedWriteScopeStyle": "explicit file list",
+      "promptStrictness": "high",
+      "evaluationMeaning": "Tests whether Qwen can implement a pure internal Kortex profile/core composition helper slice with overlay precedence, immutability, and compatibility boundaries.",
+      "promptAdaptationNotes": [
+        "Qwen is useful for small/medium internal TypeScript profile/core composition helper slices under a strict file list.",
+        "For precedence rules, require tests that prove priority independent of raw overlay input order.",
+        "For nested partial overrides, require both type-safe override shapes and runtime tests for nested label/graph fields.",
+        "For immutability claims, require deep-clone/no-shared-reference checks in addition to input snapshot tests."
+      ],
+      "task": "Profile overlay composition helper slice",
+      "slice": "Add ProfileOverlay types and composeDomainProfile pure helper with tests for overlay node additions, overrides, precedence, relationship id merge, metadata merge, partial labels/graph overrides, and immutability.",
+      "difficulty": "small-medium-bounded-refactor",
+      "allowedWriteScope": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "rating": "strong",
+      "score": 8,
+      "outcome": "Accepted after reviewer fixes. The implementation was scoped and verified, but Codex fixed personal overlay precedence, nested partial override typings/tests, deep-clone behavior, a test cast/import cleanup, and non-ASCII text in handoff/test comments.",
+      "filesChanged": [
+        "src/features/ontology/types.ts",
+        "src/features/ontology/index.ts",
+        "src/features/ontology/profileComposition.ts",
+        "src/features/ontology/__tests__/profileComposition.test.ts",
+        "ONTOLOGY_PROFILE_REFACTOR/implementation_handoff.md"
+      ],
+      "strengths": [
+        "Stayed inside the explicit implementation scope and did not touch persistence, UI, DB, backup/import/export, MCP, Racket, or source adapters.",
+        "Added the requested ProfileOverlayKind/ProfileOverlay types and a pure composeDomainProfile helper.",
+        "Covered the main requested scenarios with 11 focused Vitest tests.",
+        "Merged relationshipTypeNodeIds with dedupe and metadataFields by id with overlay precedence.",
+        "Preserved codingProfile behavior and existing relationship ids instead of redesigning taxonomy."
+      ],
+      "projectSpecificStrengths": [
+        "Matched the Kortex profile branching/overlay direction without introducing persistence or UI activation too early.",
+        "Kept getActiveDomainProfile() returning codingProfile directly, preserving the current app seam.",
+        "Respected the current prerequisite/related/contrast compatibility boundary while leaving future is/is-not semantics for a later decision slice."
+      ],
+      "generalizedStackStrengths": [
+        "Good fit for TypeScript type additions, pure helper implementation, and Vitest coverage inside a feature folder.",
+        "Can compose config/profile objects without requiring framework or runtime changes.",
+        "Can keep a React Native/TypeScript repo compiling cleanly on a bounded internal utility slice."
+      ],
+      "generalizedCodingStrengths": [
+        "Strong scope control under a strict bounded ticket.",
+        "Good at pure composition/helper code when behavior is explicitly specified.",
+        "Good test breadth for a small internal API slice.",
+        "Needs prompts to stress priority semantics, nested partial typing, and deep-clone reference safety."
+      ],
+      "misses": [
+        "Applied overlays strictly in raw input order even though the prompt specified personal overlays should apply last.",
+        "The personal-precedence test name claimed personal wins, but one assertion expected the later project overlay to win.",
+        "Nested partial override types were too shallow for the intended flashback and graph sub-label override behavior.",
+        "Graph merging could reuse nested base objects when no override existed, weakening the deep-clone contract.",
+        "Left an unused test import, used an unnecessary as-any cast in a test, and introduced non-ASCII dash text in handoff/test comments."
+      ],
+      "reviewerFixes": [
+        "Added overlay priority ordering so project and learning overlays apply first while personal overlays apply last, preserving input order within the same priority.",
+        "Changed the personal precedence test to prove personal wins even when listed before a project overlay.",
+        "Added DomainLabelOverrides and GraphProfileOverrides types for nested partial labels/graph overrides, plus tests for flashback and statusLabels partial overrides.",
+        "Deep-cloned boundary rule evidenceIds, metadata enum option objects, and nested graph label/color/status/tooltip/legend maps.",
+        "Removed the unused import and as-any cast, normalized non-ASCII text, updated handoff verification, and reran TypeScript, targeted tests, full suite, and rg checks."
+      ],
+      "verification": [
+        "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit: clean",
+        "npm test -- --run src/features/ontology/__tests__/codingProfile.test.ts src/features/ontology/__tests__/profileComposition.test.ts: 24/24 passed across 2 files",
+        "npm test -- --run: 367/367 passed across 51 files",
+        "rg \"composeDomainProfile|ProfileOverlay|profileComposition\" src/features/ontology: hits confined to ontology types/index/profileComposition/test",
+        "rg \"ontology_corrections|ontology_patch_suggestions\" src: only the existing stage10 architecture guard test hit",
+        "rg \"prerequisite|related|contrast|is not|is / is not\" src/features/ontology: no relationship taxonomy redesign; hits are current coding profile/tests/corrections text plus the new merge test"
+      ],
+      "recommendedUse": [
+        "Small/medium strict bounded TypeScript profile/core composition helper slices.",
+        "Pure domain/config merge utilities with explicit precedence rules and focused tests.",
+        "Internal ontology/profile API groundwork where persistence and UI are out of scope."
+      ],
+      "avoidFor": [
+        "Persistence, backup/import/export, restore, migration, or data-loss-adjacent work until separately proven.",
+        "Broad relationship taxonomy redesign or is/is-not semantic rewrites without a dedicated architecture decision slice.",
+        "Unreviewed precedence-sensitive logic unless the prompt requires reversed/input-order priority tests.",
+        "Nested partial override APIs unless the prompt requires TypeScript-safe nested examples and runtime nested-field tests."
+      ],
+      "promptImprovements": [
+        "For composition/precedence helpers, require tests where overlays are deliberately passed in the opposite order from the expected priority.",
+        "For personal/project/learning overlay rules, state whether precedence is raw input order or kind priority, and include a test proving the answer.",
+        "For nested partial override APIs, ban shallow Partial-only shortcuts when nested keys are expected to be overrideable.",
+        "For immutability claims, require no shared nested objects in the output, not only no input mutation.",
+        "For TypeScript test code, require no as-any casts unless the final report explicitly justifies them.",
+        "Ask workers to keep docs/test comments ASCII-only unless the file already requires non-ASCII text."
+      ],
+      "usefulTools": [
+        "rg",
+        "TypeScript",
+        "Vitest targeted tests",
+        "full Vitest",
+        "git diff review"
+      ],
+      "tags": [
+        "profile-composition",
+        "profile-overlays",
+        "composition-helper",
+        "precedence-rules",
+        "deep-clone-immutability",
+        "strict-bounded-ticket",
+        "strong"
+      ],
+      "projectTags": [
+        "codelens-rn",
+        "ontology-profile",
+        "kortex-core",
+        "profile-branching",
+        "overlay-composition"
+      ],
+      "stackTags": [
+        "typescript",
+        "vitest",
+        "feature-folders"
+      ],
+      "generalCodingTags": [
+        "bounded-refactor",
+        "compatibility-boundary",
+        "composition-helper",
+        "precedence-rules",
+        "deep-clone-immutability",
+        "test-discipline",
+        "scope-control",
+        "reporting",
+        "prompt-style-aware"
+      ],
+      "riskTags": [
+        "watch-precedence-semantics",
+        "watch-nested-partial-types",
+        "watch-deep-clone-reference-sharing",
+        "avoid-persistence-without-review"
+      ]
     }
   ],
   "generalizedLessons": [
@@ -2542,6 +2704,30 @@
         "Kimi K2.6",
         "future dynamic label workers"
       ]
+    },
+    {
+      "id": "composition-priority-tests",
+      "lesson": "For composition helpers with priority classes, require tests that prove the priority rule independent of raw input order, not only same-order overlay application.",
+      "appliesTo": [
+        "Qwen 3.6 Plus",
+        "future profile/core composition workers"
+      ]
+    },
+    {
+      "id": "nested-partial-override-tests",
+      "lesson": "For nested partial override APIs, require both type support and runtime tests for nested fields; shallow Partial types may pass simple tests while rejecting intended callers.",
+      "appliesTo": [
+        "Qwen 3.6 Plus",
+        "future TypeScript config/profile workers"
+      ]
+    },
+    {
+      "id": "deep-clone-immutability",
+      "lesson": "For pure merge helpers, no-input-mutation snapshot tests are not enough; require checks or review for cloned nested maps, arrays, and option objects so output does not share mutable internals with inputs.",
+      "appliesTo": [
+        "Qwen 3.6 Plus",
+        "future composition-helper workers"
+      ]
     }
   ],
   "promptStyleTaxonomy": {
@@ -2556,10 +2742,13 @@
     "Use strict bounded tickets for implementation work by cheap/open-weight workers until a model proves broader autonomous planning.",
     "For compatibility aliases, require preferred-only, legacy-only, and both-present behavior to be specified and tested or guarded.",
     "For persistence-adjacent work, require raw boundary-shape tests and validate-before-wipe behavior, or keep the worker draft-only.",
-    "For read-only label audits, include placeholders, conditional labels, empty states, subtitles, and error text in the required search target list."
+    "For read-only label audits, include placeholders, conditional labels, empty states, subtitles, and error text in the required search target list.",
+    "For composition helpers with priority rules, require reversed/input-order tests that prove the priority policy, such as personal overlays winning even when listed before project overlays.",
+    "For nested partial override APIs, require TypeScript-safe nested partial examples plus runtime tests for nested fields.",
+    "For pure merge helpers, require nested deep-clone/no-shared-reference checks, not only input snapshot equality."
   ]
 }
-</script>
+  </script>
   <script>
     const db = JSON.parse(document.getElementById('hr-data').textContent);
     const cards = document.getElementById('cards');

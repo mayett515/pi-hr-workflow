@@ -175,6 +175,30 @@ Add or update a test/type check that proves the old API still works, or explicit
 
 Why: module compatibility and API compatibility are different. A shim that preserves only the import path can still break old callers.
 
+## Add These for Composition Helpers
+
+Use this when a slice implements profile/core composition, overlay merging, priority ordering, config merging, or other pure merge helpers:
+
+```markdown
+<composition_precedence_policy>
+State whether precedence follows raw input order, kind priority, user priority, or another rule.
+Add tests that pass inputs in the opposite order from the expected priority.
+Example: if personal overlays must win over project overlays, test personal-before-project and project-before-personal.
+</composition_precedence_policy>
+
+<nested_override_policy>
+If nested partial overrides are supported, add both TypeScript-safe examples and runtime tests for nested fields.
+Do not rely on a shallow Partial type when nested keys are expected to be overrideable.
+</nested_override_policy>
+
+<deep_clone_policy>
+For pure merge helpers, prove more than "inputs were not mutated".
+Add checks or review notes showing output arrays, maps, and nested option objects do not share mutable references with inputs.
+</deep_clone_policy>
+```
+
+Why: composition helpers can look correct while hiding the most expensive future bugs in precedence, nested partial typing, or shared mutable references.
+
 ## Add These for Persistence-Adjacent Work
 
 Use this when the task touches DB rows, migrations, backup/import/export, restore, codecs, or raw SQL:
@@ -223,6 +247,85 @@ After Codex review, update:
 
 Record prompt improvements in the evaluation. Future prompts should reuse those improvements when the task has matching tags.
 
+## Codex-Run Pi CLI Pattern
+
+When Codex delegates a worker slice through the local Pi CLI, prefer non-interactive mode with a saved prompt file:
+
+```powershell
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Use exact model ids when possible:
+
+```powershell
+pi --list-models qwen
+pi --list-models opencode-go
+pi --model opencode-go/qwen3.6-plus --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Here `opencode-go/...` is the OpenCode model provider inside Pi. Do not use the separate `opencode` CLI for this HR workflow.
+
+Interactive `/model` or TUI selection is fine when the human drives Pi, but Codex-run HR work should use explicit Pi CLI model ids for reproducibility.
+
+Use read-only tools for audits:
+
+```powershell
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Do not ask Pi to make product decisions. Worker prompts should say:
+
+```markdown
+<decision_policy>
+If the task requires a product, architecture, persistence, UI, relationship-semantics, app-builder,
+agent/subagent runtime, MCP, adapter, DSL, open-source, pricing, or analytics decision not explicitly
+settled in this prompt, stop and report the decision needed. Do not invent the direction.
+</decision_policy>
+```
+
+This keeps Pi useful as the implementation worker while Codex and the human remain the orchestrator/owner.
+
+## Multi-Slice Prompt Batches
+
+When the user asks for multiple slices, Codex should propose a batch before launching workers:
+
+```markdown
+<batch_plan>
+Batch goal:
+
+Slice 1:
+- model:
+- prompt style:
+- type: implementation | guard-test | docs | read-only audit
+- goal:
+- allowed write scope:
+- do-not-edit:
+- verification:
+- big decision needed first: yes/no
+
+Slice 2:
+...
+</batch_plan>
+```
+
+Worker prompts inside a batch must still be independent strict tickets. Do not give one Pi worker several unrelated edits in one prompt.
+
+For progress updates, use:
+
+```text
+Batch progress: <done>/<total> done
+Done:
+- Slice N: result, tests, HR score
+Current:
+- Slice N: model and goal
+Remaining:
+- Slice N: model and goal
+Blocked decisions:
+- question, if any
+```
+
+Run edit-capable Pi slices sequentially in the shared worktree. A failed slice should be reviewed and either repaired, rejected, or re-ticketed before the next edit worker starts.
+
 ## Current Best Practices From Trials
 
 - Add an explicit `rg` audit for naming slices.
@@ -240,5 +343,10 @@ Record prompt improvements in the evaluation. Future prompts should reuse those 
 - Do not reuse generic singular/plural profile labels for inline text unless their capitalization exactly matches the old rendered wording.
 - When a field is described as optional/null, require separate tests for both omitted and explicit `null` values; nullable-only tests do not prove optional semantics.
 - For validation helper slices, state whether runtime validation of closed union fields is required or whether TypeScript-only enforcement is acceptable.
+- For composition/precedence helpers, require reversed/input-order tests that prove the priority rule. A test named "personal wins" is not enough if its assertion still follows raw input order.
+- For nested partial override APIs, require type support plus runtime nested-field assertions; shallow partial tests can miss the intended caller shape.
+- For pure merge helpers, require deep-clone/no-shared-reference checks for nested maps, arrays, and option objects, not only input snapshot equality.
+- Ban `as any` in worker tests unless the final report explicitly justifies why it is needed.
+- Ask workers to keep docs and test comments ASCII-only unless the target file already requires non-ASCII text.
 - For test-only guard tasks, require the final report to separate the actual number of new `it(...)` test blocks from the number of logical assertions covered inside those tests.
 - Ask guard-test workers to describe residual risk accurately: source-level guards prevent specific regressions, but they do not prove future persistence/UI behavior is complete or risk-free.

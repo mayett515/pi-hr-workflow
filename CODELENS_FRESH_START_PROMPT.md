@@ -49,6 +49,54 @@ How this workflow works:
 4. Codex reviews the actual diff, verifies TypeScript/tests, fixes only small reviewer polish if needed, and rates the worker.
 5. Codex updates both CodeLens refactor docs and the Pi HR database/docs.
 
+Codex may also run Pi directly through the local CLI when the user asks for delegation:
+
+```powershell
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Prefer exact model ids for reproducible HR records:
+
+```powershell
+pi --list-models qwen
+pi --list-models opencode-go
+pi --model opencode-go/qwen3.6-plus --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Here `opencode-go/...` is the OpenCode model provider inside Pi. Do not use the separate `opencode` CLI for this HR workflow.
+
+Interactive `/model` or TUI model selection is okay when the human drives Pi. For Codex-run HR work, use explicit Pi CLI model ids.
+
+For read-only audits, use only read/search/list tools:
+
+```powershell
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Even when Codex runs Pi, Codex remains orchestrator/reviewer. Big product or architecture decisions stay with the human and Codex; Pi should stop and report when a ticket requires an unsettled decision.
+
+If the user asks for several slices, Codex should propose a batch plan first:
+
+- up to 4 slices
+- model and prompt style per slice
+- allowed write scope and do-not-edit list per slice
+- verification per slice
+- explicit "decision needed first" marker
+
+Run edit-capable Pi workers one at a time in the shared worktree. After each accepted slice, report:
+
+```text
+Batch progress: <done>/<total> done
+Done:
+- Slice N: result, tests, HR score
+Current:
+- Slice N: model and goal
+Remaining:
+- Slice N: model and goal
+Blocked decisions:
+- question, if any
+```
+
 When creating a worker prompt:
 - Say which prompt style you are using and why.
 - Include exact repo path, branch, files to read, allowed write scope, do-not-edit list, compatibility boundaries, verification commands, rg/search requirements, and final report shape.

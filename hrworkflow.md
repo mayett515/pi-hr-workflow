@@ -8,6 +8,121 @@ This workflow is for testing local or cheap coding models as bounded workers whi
 - Codex reviewer: inspects the actual diff, runs verification, fixes small polish issues if needed, and rates the worker.
 - Human owner: chooses which model to try next and decides whether a model is trusted for harder slices.
 
+## Codex-Orchestrated Pi CLI Workflow
+
+Codex may run Pi directly when the user asks to delegate a bounded worker slice.
+
+Use the Pi CLI in non-interactive mode so the run is reproducible:
+
+```powershell
+pi --model <provider/model-or-pattern> --thinking <level> --tools read,grep,find,ls,edit,bash -p @<prompt-file>
+```
+
+List/select Pi models with:
+
+```powershell
+pi --list-models <search>
+pi --list-models opencode-go
+pi --model opencode-go/qwen3.6-plus --thinking high -p @<prompt-file>
+```
+
+In this HR workflow, `opencode-go/...` means the OpenCode model provider exposed inside Pi. Do not use the separate `opencode` CLI for HR worker runs.
+
+Do not rely on interactive `/model` selection for HR runs unless the human is driving the Pi TUI. For Codex-run HR work, use explicit Pi CLI model ids so the evaluation is reproducible.
+
+Recommended session shape:
+
+```powershell
+pi --model <model> --thinking high --session-dir C:\pi-stuff\sessions --tools read,grep,find,ls,edit,bash -p @C:\pi-stuff\prompts\<ticket>.md
+```
+
+Codex should not use Pi as a second orchestrator. Pi is the bounded worker. Codex remains the reviewer and decision gate.
+
+Before launching Pi, Codex must:
+
+- read `model_hr_db.json`, `HR_DATABASE.md`, and `FUTURE_PI_PROMPTING.md`
+- recommend the model and prompt style
+- inspect current `git status --short`
+- write or show the strict bounded ticket
+- define exact allowed write scope
+- define exact do-not-edit boundaries
+- define exact verification commands and rg/search checks
+- ask the human before any big product or architecture decision
+
+Big decisions stay with the human and Codex, not Pi:
+
+- relationship semantics such as `is` / `is not`
+- persistence, backup, import, restore, migrations, or data-loss boundaries
+- first UI/product surface for correction flows
+- app-builder, agent/subagent runtime, MCP, adapter, or DSL direction
+- public/open-source strategy
+- pricing, hosting, telemetry, analytics, or product positioning
+- any scope expansion outside the agreed ticket
+
+After Pi finishes, Codex must:
+
+- inspect the actual diff
+- reject or fix scope violations
+- run TypeScript, targeted tests, full tests when appropriate, and required rg/search checks
+- update CodeLens handoff/docs if the slice is accepted
+- update `model_hr_db.json`, `hr_findings_viewer.html`, and HR markdown docs if this was a real worker evaluation
+- clearly separate Pi's work from Codex reviewer fixes in the HR record
+
+If Pi requires an architectural choice to continue, the correct behavior is to stop and ask the human. Do not let the worker invent the product direction.
+
+## Multi-Slice Batch Workflow
+
+When the user asks for several slices, such as "give me 4 slices", Codex should create a batch plan before running workers.
+
+Batch plan format:
+
+```text
+Batch: <short goal>
+
+Slice 1
+  model:
+  prompt style:
+  goal:
+  allowed write scope:
+  do-not-edit:
+  verification:
+  decision needed before run:
+
+Slice 2
+  ...
+```
+
+Rules:
+
+- propose up to 4 slices at once
+- mark which slices are implementation, guard/test, docs, or read-only audit
+- choose the model from HR history for each slice
+- ask the human before any slice that contains a big decision
+- run edit-capable workers one at a time in the shared worktree
+- do not start the next edit slice until Codex has reviewed, tested, and either accepted or rejected the previous slice
+- read-only audits may be batched more freely, but their findings still need Codex verification before implementation
+- after each accepted worker slice, update CodeLens handoff/docs and Pi HR if it was a real model evaluation
+
+Progress updates to the user should use this shape:
+
+```text
+Batch progress: 2/4 done
+Done:
+- Slice 1: <result>, tests, HR score
+- Slice 2: <result>, tests, HR score
+
+Current:
+- Slice 3: <running model>, <goal>
+
+Remaining:
+- Slice 4: <goal/model>
+
+Blocked decisions:
+- <question for human, if any>
+```
+
+If a later slice depends on a big product/architecture decision, pause the batch and ask the human before continuing.
+
 ## HR Database Files
 
 Use these files to remember model performance across tasks:
@@ -46,6 +161,9 @@ Current general coding tags:
 - `scope-control`
 - `reporting`
 - `persistence-risk`
+- `composition-helper`
+- `precedence-rules`
+- `deep-clone-immutability`
 
 ## Worker Prompt Shape
 
@@ -97,6 +215,7 @@ Prompts should adapt to the model and task, not stay one-size-fits-all.
 - Weak compatibility model: require preferred-only, legacy-only, and both-present tests before accepting implementation.
 - Persistence-risk model: avoid implementation; if used at all, require raw DB shape tests and validate-before-wipe rules.
 - Strong inference model: allow a little less file-by-file context only when the task is non-destructive and easy to review.
+- Composition-helper model: require reversed/input-order precedence tests, nested partial override tests, and deep-clone/no-shared-reference checks.
 
 Tell the user which prompt style you are using and why before sending a worker prompt. This keeps the HR result interpretable.
 
@@ -236,9 +355,10 @@ Qwen 3.6 Plus:
 - Result on retrieval `typeNodeId` / `typeNodeIds` slice: strong.
 - Result on tiny `GraphLegend` title profile-label slice: strong, 9/10; needed only one redundant profile accessor cleanup.
 - Result on ontology correction evidence groundwork slice: strong, 8/10; stayed domain-only and scoped, but Codex fixed `reason` from required nullable to optional nullable and added the omitted-reason test.
+- Result on profile overlay composition helper slice: strong, 8/10; stayed scoped and verified, but Codex fixed personal overlay precedence, nested partial override typing/tests, deep-clone behavior, and minor test/doc cleanup.
 - Preserved `conceptTypes` as a compatibility alias while adding preferred `typeNodeIds`.
 - Followed TypeScript payload rename through codecs, row mappers, formatters, tests, and necessary downstream consumers.
-- Good candidate for medium compatibility-preserving API/payload rename slices, tiny/small strict profile-label wiring tickets, and small TypeScript domain-shape/validation-helper groundwork.
+- Good candidate for medium compatibility-preserving API/payload rename slices, tiny/small strict profile-label wiring tickets, small TypeScript domain-shape/validation-helper groundwork, and small/medium internal profile/core composition helpers. Prompt composition tasks with explicit precedence, nested partial override, and deep-clone checks.
 
 MiniMax M 2.7:
 - Result on `TypeNodeChip` UI primitive rename slice: medium.
@@ -280,9 +400,10 @@ DeepSeek V4 Flash:
 
 ## Current Refactor Next-Step Queue
 
-1. Optional tiny polish: decide whether `GraphLegend.tsx` "Legend" title should be profile-driven or treated as structural UI chrome.
-2. Next major product slice remains ontology correction/checker, after label polish is committed.
-3. Later only: second-profile support and cleanup migrations after compatibility is proven.
+1. Profile composition helpers are implemented and verified; decide next whether to wire a first runtime seam, persist overlay/branch state, or continue toward correction persistence/checker.
+2. Keep Racket/DSL, source adapters, MCP, file watchers, and Kortex-over-codebase sync as documented architecture, not next-slice implementation.
+3. Before changing relationship semantics, explicitly reconcile current `prerequisite` / `related` / `contrast` compatibility with the newer `is` / `is not` boundary-anchor direction.
+4. Later only: second-profile support, overlay activation UI, adapter write-back, and cleanup migrations after compatibility is proven.
 
 ## Rule of Thumb
 
